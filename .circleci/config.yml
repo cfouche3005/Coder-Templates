@@ -15,7 +15,7 @@ workflows:
       jobs:
         - docker/publish:
             use-docker-credentials-store: false 
-            docker-password: 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 
+            docker-password: ${{ secrets.SuperSecret }}
             docker-username: cfouche3005 
             docker-context: ./docker/debian-docker/base 
             dockerfile: coder-debian 
