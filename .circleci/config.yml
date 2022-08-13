@@ -5,7 +5,7 @@ version: 2.1
 executors:
   docker-bp:
     docker:
-        - image: cimg/base:current
+        - image: cimg/base:current-22.04
     resource_class: medium
 
 jobs:
