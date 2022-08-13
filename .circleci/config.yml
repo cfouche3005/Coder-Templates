@@ -16,7 +16,7 @@ jobs:
       - checkout
       - setup_remote_docker :
           docker_layer_caching: true
-          version : 20.10.14
+          version : 19.03.13
       - run :
           name: Build Docker image
           command: cd $DOCKERFILE_PATH && docker buildx build --platform linux/arm64/v8,linux/amd64 -t $IMAGE_NAME:$TAG .
@@ -35,7 +35,7 @@ jobs:
             at: /tmp/workspace
         - setup_remote_docker :
            docker_layer_caching: true
-           version : 20.10.14
+           version : 19.03.13
         - run:
             name: Load archived Docker image
             command: docker load -i /tmp/workspace/image.tar
