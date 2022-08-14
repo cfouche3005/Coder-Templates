@@ -3,65 +3,84 @@
 version: 2.1
 
 executors:
-  docker-bp:
+  vm-bp-amd64:
     environment:
-      BUILDX_PLATFORMS : linux/arm64/v8,linux/amd64
+      ARCH_TAG : amd64
+      BUILDX_PLATFORMS : linux/amd64
     machine:
-        image: ubuntu-2204:2022.04.1
+        image: ubuntu-2004:current
         docker_layer_caching: true
     resource_class: medium
+  
+  vm-bp-arm64:
+    environment:
+      ARCH_TAG : arm64
+      BUILDX_PLATFORMS : linux/arm64/v8
+    machine:
+        image: ubuntu-2004:current
+        docker_layer_caching: true
+    resource_class: arm.medium
+  
+  docker-other:
+    docker:
+      - image: cimg/base:current
+    resource_class : small
 
 jobs:
 
-  DockerBuild:
-      executor: docker-bp
+  DockerBuildPublish-amd64:
+      executor: vm-bp-amd64
       steps:
       - checkout
       - run :
-          name: setup Qemu
-          command: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-      - run:
-          name: Create builder
-          command: |
-            export DOCKER_CLI_EXPERIMENTAL=enabled
-            docker context create multi-arch-build
-            docker buildx create --use multi-arch-build
+          name: Build Docker image
+          command: cd $DOCKERFILE_PATH && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-ARCH_TAG .
+      - run :
+          name: Publish Docker Image to Docker Hub
+          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-ARCH_TAG
+  
+  DockerBuildPublish-arm64:
+      executor: vm-bp-arm64
+      steps:
+      - checkout
       - run :
           name: Build Docker image
-          command: cd $DOCKERFILE_PATH && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG .
-      - run:
-            name: Archive Docker image
-            command: cd && docker save -o image.tar $IMAGE_NAME
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./image.tar
+          command: cd $DOCKERFILE_PATH && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-ARCH_TAG .
+      - run :
+          name: Publish Docker Image to Docker Hub
+          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-ARCH_TAG
+      
 
-  DockerPublish:
-      executor: docker-bp
+  DockerPublish-multiarch:
+      executor: docker-other
       steps:
-        - attach_workspace:
-            at: /tmp/workspace
-        #- setup_remote_docker :
-        #   docker_layer_caching: true
-        #   version : 20.10.14
-        - run:
-            name: Load archived Docker image
-            command: docker load -i /tmp/workspace/image.tar
+        - setup_remote_docker :
+           docker_layer_caching: true
+           version : 20.10.14
         - run :
-            name: Publish Docker Image to Docker Hub
-            command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG
+            name: Publish MultiArch
+            command: |
+              set -eu
+              export DOCKER_CLI_EXPERIMENTAL=enabled
+              docker manifest create $IMAGE_NAME:$TAG $IMAGE_NAME:$TAG-amd64 $IMAGE_NAME:$TAG-arm64
+              docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker manifest push $IMAGE_NAME:$TAG
+        
 
 workflows:
   coder-debian-base:
     jobs:
-      - DockerBuild :
+      - DockerBuildPublish-amd64 :
           context : 
             - DockerHub
             - coder-debian-base
-      - DockerPublish :
+      - DockerBuildPublish-arm64 :
+          context : 
+            - DockerHub
+            - coder-debian-base
+      - DockerPublish-multiarch :
           requires :
-            - DockerBuild
+            - DockerBuildPublish-arm64
+            - DockerBuildPublish-amd64
           context : 
             - DockerHub
             - coder-debian-base
