@@ -3,7 +3,7 @@
 version: 2.1
 
 executors:
-  vm-bp-amd64:
+  vm-build-amd64:
     environment:
       ARCH_TAG : amd64
       BUILDX_PLATFORMS : linux/amd64
@@ -12,7 +12,7 @@ executors:
         docker_layer_caching: true
     resource_class: medium
   
-  vm-bp-arm64:
+  vm-build-arm64:
     environment:
       ARCH_TAG : arm64
       BUILDX_PLATFORMS : linux/arm64/v8
@@ -28,8 +28,8 @@ executors:
 
 jobs:
 
-  DockerBuildPublish-amd64:
-      executor: vm-bp-amd64
+  DockerBuild-amd64:
+      executor: vm-build-amd64
       steps:
       - checkout
       - run :
@@ -38,9 +38,16 @@ jobs:
       - run :
           name: Publish Docker Image to Docker Hub
           command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$ARCH_TAG
+      - run:
+          name: Archive Docker image
+          command: cd && docker save -o image-$ARCH_TAG.tar $IMAGE_NAME:$TAG-$ARCH_TAG
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image-$ARCH_TAG.tar
   
-  DockerBuildPublish-arm64:
-      executor: vm-bp-arm64
+  DockerBuild-arm64:
+      executor: vm-build-arm64
       steps:
       - checkout
       - run :
@@ -49,6 +56,13 @@ jobs:
       - run :
           name: Publish Docker Image to Docker Hub
           command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$ARCH_TAG
+      - run:
+          name: Archive Docker image
+          command: cd && docker save -o image-$ARCH_TAG.tar $IMAGE_NAME:$TAG-$ARCH_TAG
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image-$ARCH_TAG.tar
       
 
   DockerPublish-multiarch:
@@ -57,6 +71,14 @@ jobs:
         - setup_remote_docker :
            docker_layer_caching: true
            version : 20.10.14
+        - attach_workspace:
+            at: /tmp/workspace
+        - run:
+            name: Load archived Docker image amd64
+            command: docker load -i /tmp/workspace/image-amd64.tar
+        - run:
+            name: Load archived Docker image amd64
+            command: docker load -i /tmp/workspace/image-arm64.tar
         - run :
             name: Publish MultiArch
             command: |
@@ -68,18 +90,18 @@ jobs:
 workflows:
   coder-debian-base:
     jobs:
-      - DockerBuildPublish-amd64 :
+      - DockerBuild-amd64 :
           context : 
             - DockerHub
             - coder-debian-base
-      - DockerBuildPublish-arm64 :
+      - DockerBuild-arm64 :
           context : 
             - DockerHub
             - coder-debian-base
       - DockerPublish-multiarch :
           requires :
-            - DockerBuildPublish-arm64
-            - DockerBuildPublish-amd64
+            - DockerBuild-arm64
+            - DockerBuild-amd64
           context : 
             - DockerHub
             - coder-debian-base
