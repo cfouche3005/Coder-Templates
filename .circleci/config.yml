@@ -38,13 +38,6 @@ jobs:
       - run :
           name: Publish Docker Image to Docker Hub
           command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG
-      #- run:
-      #    name: Archive Docker image
-      #    command: cd /home/circleci/project && docker save -o image-amd64.tar $IMAGE_NAME:$TAG-$ARCH_TAG
-      #- persist_to_workspace:
-      #    root: .
-      #    paths:
-      #      - ./image-amd64.tar
   
   DockerBuild-arm64:
       executor: vm-build-arm64
@@ -56,14 +49,6 @@ jobs:
       - run :
           name: Publish Docker Image to Docker Hub
           command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG
-      #- run:
-      #    name: Archive Docker image
-      #    command: cd /home/circleci/project && docker save -o image-arm64.tar $IMAGE_NAME:$TAG-$ARCH_TAG
-      #- persist_to_workspace:
-      #    root: .
-      #    paths:
-      #      - ./image-arm64.tar
-      
 
   DockerPublish-multiarch:
       executor: docker-other
@@ -71,20 +56,32 @@ jobs:
         - setup_remote_docker :
            docker_layer_caching: true
            version : 20.10.14
-        #- attach_workspace:
-        #    at: /tmp/workspace
-        #- run:
-        #    name: Load archived Docker image amd64
-        #    command: docker load -i /tmp/workspace/image-amd64.tar
-        #- run:
-        #    name: Load archived Docker image arm64
-        #    command: docker load -i /tmp/workspace/image-arm64.tar
         - run :
             name: Publish MultiArch
             command: |
               export DOCKER_CLI_EXPERIMENTAL=enabled
               docker manifest create $IMAGE_NAME:$TAG-$FLAVOUR $IMAGE_NAME:$TAG-$FLAVOUR-amd64 $IMAGE_NAME:$TAG-$FLAVOUR-arm64
               docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker manifest push $IMAGE_NAME:$TAG-$FLAVOUR
+              
+  DeleteTempImage-amd64:
+    executor: docker-other
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+          version: 20.10.14
+      - run :
+          name : Delete amd64 image
+          command: curl -u $DOCKER_LOGIN:$DOCKER_PASSWORD -X "DELETE" https://cloud.docker.com/v2/repositories/$IMAGE_NAME/tags/$TAG-$FLAVOUR-amd64/
+  
+  DeleteTempImage-arm64:
+    executor: docker-other
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+          version: 20.10.14
+      - run :
+          name : Delete arm64 image
+          command: curl -u $DOCKER_LOGIN:$DOCKER_PASSWORD -X "DELETE" https://cloud.docker.com/v2/repositories/$IMAGE_NAME/tags/$TAG-$FLAVOUR-arm64/
         
 
 workflows:
@@ -106,6 +103,22 @@ workflows:
           requires :
             - DockerBuild-arm64
             - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-base
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-base
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
           context : 
             - DockerHub
             - Debian
