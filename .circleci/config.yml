@@ -40,7 +40,7 @@ jobs:
           command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$ARCH_TAG
       - run:
           name: Archive Docker image
-          command: cd && docker save -o image-amd64.tar $IMAGE_NAME:$TAG-$ARCH_TAG
+          command: cd /home/circleci/project && docker save -o image-amd64.tar $IMAGE_NAME:$TAG-$ARCH_TAG
       - persist_to_workspace:
           root: .
           paths:
@@ -58,7 +58,7 @@ jobs:
           command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$ARCH_TAG
       - run:
           name: Archive Docker image
-          command: cd && docker save -o image-arm64.tar $IMAGE_NAME:$TAG-$ARCH_TAG
+          command: cd /home/circleci/project && docker save -o image-arm64.tar $IMAGE_NAME:$TAG-$ARCH_TAG
       - persist_to_workspace:
           root: .
           paths:
