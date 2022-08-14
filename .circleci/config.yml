@@ -34,17 +34,17 @@ jobs:
       - checkout
       - run :
           name: Build Docker image
-          command: cd $DOCKERFILE_PATH && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-$ARCH_TAG .
-      #- run :
-      #    name: Publish Docker Image to Docker Hub
-      #    command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$ARCH_TAG
-      - run:
-          name: Archive Docker image
-          command: cd /home/circleci/project && docker save -o image-amd64.tar $IMAGE_NAME:$TAG-$ARCH_TAG
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./image-amd64.tar
+          command: cd $D_PATH/$FLAVOUR/$TAG && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG .
+      - run :
+          name: Publish Docker Image to Docker Hub
+          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG
+      #- run:
+      #    name: Archive Docker image
+      #    command: cd /home/circleci/project && docker save -o image-amd64.tar $IMAGE_NAME:$TAG-$ARCH_TAG
+      #- persist_to_workspace:
+      #    root: .
+      #    paths:
+      #      - ./image-amd64.tar
   
   DockerBuild-arm64:
       executor: vm-build-arm64
@@ -52,17 +52,17 @@ jobs:
       - checkout
       - run :
           name: Build Docker image
-          command: cd $DOCKERFILE_PATH && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-$ARCH_TAG .
-      #- run :
-      #    name: Publish Docker Image to Docker Hub
-      #    command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$ARCH_TAG
-      - run:
-          name: Archive Docker image
-          command: cd /home/circleci/project && docker save -o image-arm64.tar $IMAGE_NAME:$TAG-$ARCH_TAG
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./image-arm64.tar
+          command: cd $D_PATH/$FLAVOUR/$TAG && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG .
+      - run :
+          name: Publish Docker Image to Docker Hub
+          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG
+      #- run:
+      #    name: Archive Docker image
+      #    command: cd /home/circleci/project && docker save -o image-arm64.tar $IMAGE_NAME:$TAG-$ARCH_TAG
+      #- persist_to_workspace:
+      #    root: .
+      #    paths:
+      #      - ./image-arm64.tar
       
 
   DockerPublish-multiarch:
@@ -71,37 +71,43 @@ jobs:
         - setup_remote_docker :
            docker_layer_caching: true
            version : 20.10.14
-        - attach_workspace:
-            at: /tmp/workspace
-        - run:
-            name: Load archived Docker image amd64
-            command: docker load -i /tmp/workspace/image-amd64.tar
-        - run:
-            name: Load archived Docker image arm64
-            command: docker load -i /tmp/workspace/image-arm64.tar
+        #- attach_workspace:
+        #    at: /tmp/workspace
+        #- run:
+        #    name: Load archived Docker image amd64
+        #    command: docker load -i /tmp/workspace/image-amd64.tar
+        #- run:
+        #    name: Load archived Docker image arm64
+        #    command: docker load -i /tmp/workspace/image-arm64.tar
         - run :
             name: Publish MultiArch
             command: |
               export DOCKER_CLI_EXPERIMENTAL=enabled
-              docker manifest create $IMAGE_NAME:$TAG $IMAGE_NAME:$TAG-amd64 $IMAGE_NAME:$TAG-arm64
-              docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker manifest push $IMAGE_NAME:$TAG
+              docker manifest create $IMAGE_NAME:$TAG-$FLAVOUR $IMAGE_NAME:$TAG-$FLAVOUR-amd64 $IMAGE_NAME:$TAG-$FLAVOUR-arm64
+              docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker manifest push $IMAGE_NAME:$TAG-$FLAVOUR
         
 
 workflows:
-  coder-debian-base:
+  ctdc-base-no-vsc-debian:
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
-            - coder-debian-base
+            - Debian
+            - ctdc-base
+            - no-vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
-            - coder-debian-base
+            - Debian
+            - ctdc-base
+            - no-vsc
       - DockerPublish-multiarch :
           requires :
             - DockerBuild-arm64
             - DockerBuild-amd64
           context : 
             - DockerHub
-            - coder-debian-base
+            - Debian
+            - ctdc-base
+            - no-vsc
