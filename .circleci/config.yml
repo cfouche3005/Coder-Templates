@@ -40,11 +40,11 @@ jobs:
           command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$ARCH_TAG
       - run:
           name: Archive Docker image
-          command: cd && docker save -o image-$ARCH_TAG.tar $IMAGE_NAME:$TAG-$ARCH_TAG
+          command: cd && docker save -o image-amd64.tar $IMAGE_NAME:$TAG-$ARCH_TAG
       - persist_to_workspace:
           root: .
           paths:
-            - ./image-$ARCH_TAG.tar
+            - ./image-amd64.tar
   
   DockerBuild-arm64:
       executor: vm-build-arm64
@@ -58,11 +58,11 @@ jobs:
           command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$ARCH_TAG
       - run:
           name: Archive Docker image
-          command: cd && docker save -o image-$ARCH_TAG.tar $IMAGE_NAME:$TAG-$ARCH_TAG
+          command: cd && docker save -o image-arm64.tar $IMAGE_NAME:$TAG-$ARCH_TAG
       - persist_to_workspace:
           root: .
           paths:
-            - ./image-$ARCH_TAG.tar
+            - ./image-arm64.tar
       
 
   DockerPublish-multiarch:
@@ -77,7 +77,7 @@ jobs:
             name: Load archived Docker image amd64
             command: docker load -i /tmp/workspace/image-amd64.tar
         - run:
-            name: Load archived Docker image amd64
+            name: Load archived Docker image arm64
             command: docker load -i /tmp/workspace/image-arm64.tar
         - run :
             name: Publish MultiArch
