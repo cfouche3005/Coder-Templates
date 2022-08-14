@@ -60,7 +60,6 @@ jobs:
         - run :
             name: Publish MultiArch
             command: |
-              set -eu
               export DOCKER_CLI_EXPERIMENTAL=enabled
               docker manifest create $IMAGE_NAME:$TAG $IMAGE_NAME:$TAG-amd64 $IMAGE_NAME:$TAG-arm64
               docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker manifest push $IMAGE_NAME:$TAG
