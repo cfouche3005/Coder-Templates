@@ -70,14 +70,12 @@ jobs:
           docker_layer_caching: true
           version: 20.10.14
       - run :
-          name : Get Auth Token
+          name : Get Auth Token and Delete amd64 image
           command : |
             TOKEN=`curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d '{"username": $DOCKER_LOGIN, "password": $DOCKER_PASSWORD}' "https://hub.docker.com/v2/users/login/" | jq -r .token`
-      - run :
-          name : Delete amd64 image
-          command: |
+            echo $TOKEN
             curl "https://hub.docker.com/v2/repositories/$IMAGE_NAME/tags/$TAG-$FLAVOUR-amd64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
-  
+
   DeleteTempImage-arm64:
     executor: docker-other
     steps:
@@ -85,12 +83,10 @@ jobs:
           docker_layer_caching: true
           version: 20.10.14
       - run :
-          name : Get Auth Token
+          name : Get Auth Token and Delete arm64 image
           command : |
             TOKEN=`curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d '{"username": $DOCKER_LOGIN, "password": $DOCKER_PASSWORD}' "https://hub.docker.com/v2/users/login/" | jq -r .token`
-      - run :
-          name : Delete amd64 image
-          command: |
+            echo $TOKEN
             curl "https://hub.docker.com/v2/repositories/$IMAGE_NAME/tags/$TAG-$FLAVOUR-arm64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
   
 
