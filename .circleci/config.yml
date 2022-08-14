@@ -34,10 +34,10 @@ jobs:
       - checkout
       - run :
           name: Build Docker image
-          command: cd $DOCKERFILE_PATH && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-ARCH_TAG .
+          command: cd $DOCKERFILE_PATH && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-$ARCH_TAG .
       - run :
           name: Publish Docker Image to Docker Hub
-          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-ARCH_TAG
+          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$ARCH_TAG
   
   DockerBuildPublish-arm64:
       executor: vm-bp-arm64
@@ -45,10 +45,10 @@ jobs:
       - checkout
       - run :
           name: Build Docker image
-          command: cd $DOCKERFILE_PATH && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-ARCH_TAG .
+          command: cd $DOCKERFILE_PATH && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-$ARCH_TAG .
       - run :
           name: Publish Docker Image to Docker Hub
-          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-ARCH_TAG
+          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$ARCH_TAG
       
 
   DockerPublish-multiarch:
