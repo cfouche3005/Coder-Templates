@@ -91,7 +91,7 @@ jobs:
   
 
 workflows:
-  ctdc-base-no-vsc-debian:
+  ctdc-base-debian-no-vsc:
     jobs:
       - DockerBuild-amd64 :
           context : 
@@ -130,3 +130,43 @@ workflows:
             - Debian
             - ctdc-base
             - no-vsc
+
+  ctdc-base-debian-vsc:
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-base
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-base
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-base
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-base
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-base
+            - vsc
