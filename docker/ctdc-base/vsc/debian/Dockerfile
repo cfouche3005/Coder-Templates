@@ -3,7 +3,7 @@ FROM debian:sid-slim
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
-    DEBIAN_FRONTEND="noninteractive" apt-get install --yes \
+    DEBIAN_FRONTEND="noninteractive" apt-get install --yes --no-install-recommends \
       bash \
       curl \
       htop \
@@ -17,9 +17,10 @@ RUN apt-get update && \
       zsh \
       wget && \
     add-apt-repository ppa:git-core/ppa && \
-    DEBIAN_FRONTEND="noninteractive" apt-get install --yes git
+    DEBIAN_FRONTEND="noninteractive" apt-get install --yes git \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL https://code-server.dev/install.sh | sh
+RUN curl -fsSL https://code-server.dev/install.sh | sh && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN useradd coder \
       --create-home \
