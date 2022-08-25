@@ -15,9 +15,8 @@ RUN apt-get update && \
       unzip \
       nano \
       zsh \
-      wget && \
-    add-apt-repository ppa:git-core/ppa && \
-    DEBIAN_FRONTEND="noninteractive" apt-get install --yes git \
+      wget \
+      git \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN useradd coder \
