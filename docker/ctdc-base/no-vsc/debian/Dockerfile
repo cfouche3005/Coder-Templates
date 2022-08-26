@@ -8,6 +8,7 @@ RUN apt-get update && \
       curl \
       htop \
       man \
+      software-properties-common \
       sudo \
       systemd \
       systemd-sysv \
