@@ -1,24 +1,22 @@
-FROM debian:sid-slim
+FROM fedora:36
 
 SHELL ["/bin/bash", "-c"]
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND="noninteractive" apt-get install --yes --no-install-recommends \
-      bash \
-      curl \
-      htop \
-      man \
-      sudo \
-      systemd \
-      systemd-sysv \
-      unzip \
-      nano \
-      zsh \
-      wget \
-      git \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN curl -fsSL https://code-server.dev/install.sh | sh && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN dnf -y update && \
+    dnf -y install --setopt=install_weak_deps=False \
+    bash \
+    curl \
+    htop \
+    man \
+    sudo \
+    systemd \
+    systemd-sysv \
+    unzip \
+    nano \
+    zsh \
+    wget \
+    git \
+    && dnf clean all
 
 RUN useradd coder \
       --create-home \
