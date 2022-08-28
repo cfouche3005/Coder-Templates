@@ -5,13 +5,13 @@ version: 2.1
 setup: true
 
 parameters:
-  debian:
+  ctdc-base-debian-vsc:
     type: boolean
     default: false
-  fedora:
+  ctdc-base-fedora-vsc:
     type: boolean
     default: false
-  ubuntu:
+  ctdc-base-ubuntu-vsc:
     type: boolean
     default: false
 
@@ -105,7 +105,7 @@ jobs:
 
 workflows:
   ctdc-base-debian-vsc:
-    when: << pipeline.parameters.debian >>
+    when: << pipeline.parameters.ctdc-base-debian-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
@@ -146,7 +146,7 @@ workflows:
             - vsc
 
   ctdc-base-fedora-vsc:
-    when: << pipeline.parameters.fedora >>
+    when: << pipeline.parameters.ctdc-base-fedora-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
@@ -187,7 +187,7 @@ workflows:
             - vsc
 
   ctdc-base-ubuntu-vsc:
-    when: << pipeline.parameters.ubuntu >>
+    when: << pipeline.parameters.ctdc-base-ubuntu-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 

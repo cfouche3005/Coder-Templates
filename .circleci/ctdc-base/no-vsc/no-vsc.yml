@@ -2,16 +2,14 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-setup: true
-
 parameters:
-  debian:
+  ctdc-base-debian-no-vsc:
     type: boolean
     default: false
-  fedora:
+  ctdc-base-fedora-no-vsc:
     type: boolean
     default: false
-  ubuntu:
+  ctdc-base-ubuntu-no-vsc:
     type: boolean
     default: false
 
@@ -105,7 +103,7 @@ jobs:
 
 workflows:
   ctdc-base-debian-no-vsc:
-    when: << pipeline.parameters.debian >>
+    when: << pipeline.parameters.ctdc-base-debian-no-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
@@ -146,7 +144,7 @@ workflows:
             - no-vsc
 
   ctdc-base-fedora-no-vsc:
-    when: << pipeline.parameters.fedora >>
+    when: << pipeline.parameters.ctdc-base-fedora-no-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
@@ -187,7 +185,7 @@ workflows:
             - no-vsc
 
   ctdc-base-ubuntu-no-vsc:
-    when: << pipeline.parameters.ubuntu >>
+    when: << pipeline.parameters.ctdc-base-ubuntu-no-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
