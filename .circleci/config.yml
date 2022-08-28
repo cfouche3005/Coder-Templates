@@ -18,4 +18,4 @@ workflows:
               docker/ctdc-base/vsc/fedora/* ctdc-base-fedora-vsc true
               docker/ctdc-base/vsc/ubuntu/* ctdc-base-ubuntu-vsc true
           base-revision: main
-          config-path: .circleci/ctdc-base/config.yml
+          config-path: .circleci/ctdc-base/continue-config.yml
