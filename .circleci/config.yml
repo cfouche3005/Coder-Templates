@@ -9,19 +9,13 @@ workflows:
   always-run-ctdc-base:
     jobs:
       - path-filtering/filter:
-          name: check-updated-file-no-vsc
+          name: check-updated-file
           mapping: |
               docker/ctdc-base/no-vsc/debian/* ctdc-base-debian-no-vsc true
               docker/ctdc-base/no-vsc/fedora/* ctdc-base-fedora-no-vsc true
               docker/ctdc-base/no-vsc/ubuntu/* ctdc-base-ubuntu-no-vsc true
-          base-revision: main
-          config-path: .circleci/ctdc-base/no-vsc/no-vsc.yml
-          
-      - path-filtering/filter:
-          name: check-updated-file-vsc
-          mapping: |
               docker/ctdc-base/vsc/debian/* ctdc-base-debian-vsc true
               docker/ctdc-base/vsc/fedora/* ctdc-base-fedora-vsc true
               docker/ctdc-base/vsc/ubuntu/* ctdc-base-ubuntu-vsc true
           base-revision: main
-          config-path: .circleci/ctdc-base/vsc/vsc.yml
+          config-path: .circleci/ctdc-base/config.yml
