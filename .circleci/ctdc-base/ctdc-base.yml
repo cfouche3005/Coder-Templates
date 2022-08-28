@@ -1,0 +1,40 @@
+version: 2.1
+
+setup: true
+
+orbs:
+  path-filtering: circleci/path-filtering
+
+parameters:
+  no-vsc:
+    type: boolean
+    default: false
+  vsc:
+    type: boolean
+    default: false
+
+workflows:
+
+  ctdc-base-no-vsc-os-check:
+    when: << pipeline.parameters.no-vsc >>
+    jobs:
+      - path-filtering/filter:
+          name: check-updated-file-os
+          mapping: |
+                docker/ctdc-base/no-vsc/debian/* debian true
+                docker/ctdc-base/no-vsc/fedora/* fedora true
+                docker/ctdc-base/no-vsc/ubuntu/* ubuntu true
+          base-revision: main
+          config-path: .circleci/ctdc-base/no-vsc/no-vsc.yml
+    
+  ctdc-base-vsc-os-check:
+    when: << pipeline.parameters.vsc >>
+    jobs:
+      - path-filtering/filter:
+          name: check-updated-file-os
+          mapping: |
+                docker/ctdc-base/vsc/debian/* debian true
+                docker/ctdc-base/vsc/fedora/* fedora true
+                docker/ctdc-base/vsc/ubuntu/* ubuntu true
+          base-revision: main
+          config-path: .circleci/ctdc-base/vsc/vsc.yml

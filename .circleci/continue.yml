@@ -1,0 +1,22 @@
+version: 2.1
+
+setup: true
+
+orbs:
+  path-filtering: circleci/path-filtering
+
+parameters:
+  ctdc-base:
+    type: boolean
+    default: false
+
+workflows:
+  ctdc-base-vsc-check:
+   when: << pipeline.parameters.ctdc-base >>
+    - path-filtering/filter:
+        name: check-updated-file-flavour
+        mapping: |
+              docker/ctdc-base/no-vsc/* no-vsc true
+              docker/ctdc-base/vsc/* vsc true
+        base-revision: main
+        config-path: .circleci/ctdc-base/ctdc-base.yml
