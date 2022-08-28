@@ -1,6 +1,5 @@
 FROM ubuntu:latest
 
-#test
 
 SHELL ["/bin/bash", "-c"]
 

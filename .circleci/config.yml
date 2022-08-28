@@ -11,11 +11,11 @@ workflows:
       - path-filtering/filter:
           name: check-updated-file
           mapping: |
-              docker/ctdc-base/no-vsc/debian/* ctdc-base-debian-no-vsc true
-              docker/ctdc-base/no-vsc/fedora/* ctdc-base-fedora-no-vsc true
-              docker/ctdc-base/no-vsc/ubuntu/* ctdc-base-ubuntu-no-vsc true
-              docker/ctdc-base/vsc/debian/* ctdc-base-debian-vsc true
-              docker/ctdc-base/vsc/fedora/* ctdc-base-fedora-vsc true
-              docker/ctdc-base/vsc/ubuntu/* ctdc-base-ubuntu-vsc true
+              docker/ctdc-base/no-vsc/debian/Dockerfile ctdc-base-debian-no-vsc true
+              docker/ctdc-base/no-vsc/fedora/Dockerfile ctdc-base-fedora-no-vsc true
+              docker/ctdc-base/no-vsc/ubuntu/Dockerfile ctdc-base-ubuntu-no-vsc true
+              docker/ctdc-base/vsc/debian/Dockerfile ctdc-base-debian-vsc true
+              docker/ctdc-base/vsc/fedora/Dockerfile ctdc-base-fedora-vsc true
+              docker/ctdc-base/vsc/ubuntu/Dockerfile ctdc-base-ubuntu-vsc true
           base-revision: main
           config-path: .circleci/ctdc-base/continue-config.yml
