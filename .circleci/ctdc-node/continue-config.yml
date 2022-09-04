@@ -1,0 +1,359 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+
+parameters:
+  ctdc-node-debian-no-vsc:
+    type: boolean
+    default: false
+  ctdc-node-fedora-no-vsc:
+    type: boolean
+    default: false
+  ctdc-node-ubuntu-no-vsc:
+    type: boolean
+    default: false
+  ctdc-node-debian-vsc:
+    type: boolean
+    default: false
+  ctdc-node-fedora-vsc:
+    type: boolean
+    default: false
+  ctdc-node-ubuntu-vsc:
+    type: boolean
+    default: false
+
+executors:
+  vm-build-amd64:
+    environment:
+      ARCH_TAG : amd64
+      BUILDX_PLATFORMS : linux/amd64
+    machine:
+        image: ubuntu-2004:current
+        docker_layer_caching: true
+    resource_class: medium
+  
+  vm-build-arm64:
+    environment:
+      ARCH_TAG : arm64
+      BUILDX_PLATFORMS : linux/arm64/v8
+    machine:
+        image: ubuntu-2004:current
+        docker_layer_caching: true
+    resource_class: arm.medium
+  
+  docker-other:
+    docker:
+      - image: cimg-node:current
+    resource_class : small
+
+jobs:
+
+  DockerBuild-amd64:
+      executor: vm-build-amd64
+      steps:
+      - checkout
+      - run :
+          name: Build Docker image
+          command: cd $D_PATH/$FLAVOUR/$TAG && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG .
+      - run :
+          name: Publish Docker Image to Docker Hub
+          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG
+  
+  DockerBuild-arm64:
+      executor: vm-build-arm64
+      steps:
+      - checkout
+      - run :
+          name: Build Docker image
+          command: cd $D_PATH/$FLAVOUR/$TAG && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG .
+      - run :
+          name: Publish Docker Image to Docker Hub
+          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG
+
+  DockerPublish-multiarch:
+      executor: docker-other
+      steps:
+        - setup_remote_docker :
+           docker_layer_caching: true
+           version : 20.10.14
+        - run :
+            name: Publish MultiArch
+            command: |
+              export DOCKER_CLI_EXPERIMENTAL=enabled
+              docker manifest create $IMAGE_NAME:$TAG-$FLAVOUR $IMAGE_NAME:$TAG-$FLAVOUR-amd64 $IMAGE_NAME:$TAG-$FLAVOUR-arm64
+              docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker manifest push $IMAGE_NAME:$TAG-$FLAVOUR
+              
+  DeleteTempImage-amd64:
+    executor: docker-other
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+          version: 20.10.14
+      - run :
+          name : Get Auth Token and Delete amd64 image
+          command : |
+            export TOKEN=`curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d '{"username": "'$DOCKER_LOGIN'", "password": "'$DOCKER_PASSWORD'"}' "https://hub.docker.com/v2/users/login/" | jq -r .token`
+            echo $TOKEN
+            curl "https://hub.docker.com/v2/repositories/$IMAGE_NAME/tags/$TAG-$FLAVOUR-amd64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
+
+  DeleteTempImage-arm64:
+    executor: docker-other
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+          version: 20.10.14
+      - run :
+          name : Get Auth Token and Delete arm64 image
+          command : |
+            export TOKEN=`curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d '{"username": "'$DOCKER_LOGIN'", "password": "'$DOCKER_PASSWORD'"}' "https://hub.docker.com/v2/users/login/" | jq -r .token`
+            echo $TOKEN
+            curl "https://hub.docker.com/v2/repositories/$IMAGE_NAME/tags/$TAG-$FLAVOUR-arm64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
+  
+
+workflows:
+
+  ctdc-node-debian-no-vsc:
+    when: << pipeline.parameters.ctdc-node-debian-no-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-node
+            - no-vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-node
+            - no-vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-node
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-node
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-node
+            - no-vsc
+
+  ctdc-node-fedora-no-vsc:
+    when: << pipeline.parameters.ctdc-node-fedora-no-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-node
+            - no-vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-node
+            - no-vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-node
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-node
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-node
+            - no-vsc
+
+  ctdc-node-ubuntu-no-vsc:
+    when: << pipeline.parameters.ctdc-node-ubuntu-no-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-node
+            - no-vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-node
+            - no-vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-node
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-node
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-node
+            - no-vsc
+  
+  ctdc-node-debian-vsc:
+    when: << pipeline.parameters.ctdc-node-debian-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-node
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-node
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-node
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-node
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-node
+            - vsc
+  
+  ctdc-node-fedora-vsc:
+    when: << pipeline.parameters.ctdc-node-fedora-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-node
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-node
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-node
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-node
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-node
+            - vsc
+
+  ctdc-node-ubuntu-vsc:
+    when: << pipeline.parameters.ctdc-node-ubuntu-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-node
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-node
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-node
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-node
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-node
+            - vsc

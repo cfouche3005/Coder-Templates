@@ -19,3 +19,16 @@ workflows:
               docker/ctdc-base/vsc/ubuntu/Dockerfile ctdc-base-ubuntu-vsc true
           base-revision: main
           config-path: .circleci/ctdc-base/continue-config.yml
+  always-run-ctdc-node:
+    jobs:
+      - path-filtering/filter:
+          name: check-updated-file
+          mapping: |
+              docker/ctdc-node/no-vsc/debian/Dockerfile ctdc-node-debian-no-vsc true
+              docker/ctdc-node/no-vsc/fedora/Dockerfile ctdc-node-fedora-no-vsc true
+              docker/ctdc-node/no-vsc/ubuntu/Dockerfile ctdc-node-ubuntu-no-vsc true
+              docker/ctdc-node/vsc/debian/Dockerfile ctdc-node-debian-vsc true
+              docker/ctdc-node/vsc/fedora/Dockerfile ctdc-node-fedora-vsc true
+              docker/ctdc-node/vsc/ubuntu/Dockerfile ctdc-node-ubuntu-vsc true
+          base-revision: main
+          config-path: .circleci/ctdc-node/continue-config.yml

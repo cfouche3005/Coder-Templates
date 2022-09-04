@@ -23,11 +23,7 @@ data "coder_workspace" "me" {
 resource "coder_agent" "main" {
   arch           = data.coder_provisioner.me.arch
   os             = "linux"
-  startup_script = <<EOF
-    #!/bin/sh
-    # install and start code-server
-    #code-server --auth none --port 13337
-    EOF
+  startup_script = var.select_vsc ? local.vsc : local.no-vsc
 
   # These environment variables allow you to make Git commits right away after creating a
   # workspace. Note that they take precedence over configuration defined in ~/.gitconfig!
@@ -41,22 +37,39 @@ resource "coder_agent" "main" {
   }
 }
 
-#resource "coder_app" "code-server" {
-#  agent_id = coder_agent.main.id
-#  name     = "code-server"
-#  url      = "http://localhost:13337/?folder=/home/coder"
-#  icon     = "/icon/code.svg"
-#}
+resource "coder_app" "code-server" {
+  count = var.select_vsc ? 1 : 0
+  agent_id = coder_agent.main.id
+  name     = "code-server"
+  url      = "http://localhost:13337/?folder=/home/coder"
+  icon     = "/icon/code.svg"
+}
 
+variable "select_vsc" {
+  type = bool
+  description = "Do you want to have Visual Studio Code server installed"
+  default = false
+}
 
-variable "docker_image" {
-  description = "Which Docker image would you like to use for your workspace?"
-  # The codercom/enterprise-* images are only built for amd64
-  default = "cf3005/ctdc-base:debian-no-vsc"
+variable "docker_os" {
+  description = "Which Operating System would you like to use for your workspace?"
+  default = "debian"
   validation {
-    condition = contains(["cf3005/ctdc-base:debian-no-vsc"], var.docker_image)
-    error_message = "Invalid Docker image!"
+    condition = contains(["debian","fedora","ubuntu"], var.docker_os)
+    error_message = "Invalid Docker OS!"
   }
+}
+
+locals {
+  no-vsc = <<EOF
+    #!/bin/sh
+    #install and start code-server
+    #code-server --auth none --port 13337
+    EOF
+  vsc = <<EOF
+    !/bin/sh
+    code-server --auth none --port 13337
+    EOF
 }
 
 resource "docker_volume" "home_volume" {
@@ -65,7 +78,7 @@ resource "docker_volume" "home_volume" {
 
 resource "docker_container" "workspace" {
   count = data.coder_workspace.me.start_count
-  image = var.docker_image
+  image = "cf3005/ctdc-base:${var.docker_os}-%{ if var.select_vsc == true }vsc%{ else }no-vsc%{ endif }"
   # Uses lower() to avoid Docker restriction on container names.
   name = "coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}"
   # Hostname makes the shell more user friendly: coder@my-workspace:~$
