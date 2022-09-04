@@ -21,7 +21,7 @@ parameters:
   ctdc-base-ubuntu-vsc:
     type: boolean
     default: false
-   ctdc-node-debian-no-vsc:
+  ctdc-node-debian-no-vsc:
     type: boolean
     default: false
   ctdc-node-fedora-no-vsc:
