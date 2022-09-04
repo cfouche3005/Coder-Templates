@@ -10,15 +10,13 @@ workflows:
     jobs:
       - path-filtering/filter:
           name: check-updated-file
-          mapping: |
-#ctdc-base          
+          mapping: |          
               docker/ctdc-base/no-vsc/debian/Dockerfile ctdc-base-debian-no-vsc true
               docker/ctdc-base/no-vsc/fedora/Dockerfile ctdc-base-fedora-no-vsc true
               docker/ctdc-base/no-vsc/ubuntu/Dockerfile ctdc-base-ubuntu-no-vsc true
               docker/ctdc-base/vsc/debian/Dockerfile ctdc-base-debian-vsc true
               docker/ctdc-base/vsc/fedora/Dockerfile ctdc-base-fedora-vsc true
               docker/ctdc-base/vsc/ubuntu/Dockerfile ctdc-base-ubuntu-vsc true
-#ctdc-node
               docker/ctdc-node/no-vsc/debian/Dockerfile ctdc-node-debian-no-vsc true
               docker/ctdc-node/no-vsc/fedora/Dockerfile ctdc-node-fedora-no-vsc true
               docker/ctdc-node/no-vsc/ubuntu/Dockerfile ctdc-node-ubuntu-no-vsc true
