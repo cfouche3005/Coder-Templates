@@ -23,6 +23,12 @@ workflows:
               docker/ctdc-node/vsc/debian/Dockerfile ctdc-node-debian-vsc true
               docker/ctdc-node/vsc/fedora/Dockerfile ctdc-node-fedora-vsc true
               docker/ctdc-node/vsc/ubuntu/Dockerfile ctdc-node-ubuntu-vsc true
+              docker/ctdc-ccpp/no-vsc/debian/Dockerfile ctdc-ccpp-debian-no-vsc true
+              docker/ctdc-ccpp/no-vsc/fedora/Dockerfile ctdc-ccpp-fedora-no-vsc true
+              docker/ctdc-ccpp/no-vsc/ubuntu/Dockerfile ctdc-ccpp-ubuntu-no-vsc true
+              docker/ctdc-ccpp/vsc/debian/Dockerfile ctdc-ccpp-debian-vsc true
+              docker/ctdc-ccpp/vsc/fedora/Dockerfile ctdc-ccpp-fedora-vsc true
+              docker/ctdc-ccpp/vsc/ubuntu/Dockerfile ctdc-ccpp-ubuntu-vsc true
           base-revision: main
           config-path: .circleci/continue-config.yml
   

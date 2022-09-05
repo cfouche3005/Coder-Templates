@@ -39,6 +39,24 @@ parameters:
   ctdc-node-ubuntu-vsc:
     type: boolean
     default: false
+  ctdc-ccpp-debian-no-vsc:
+    type: boolean
+    default: false
+  ctdc-ccpp-fedora-no-vsc:
+    type: boolean
+    default: false
+  ctdc-ccpp-ubuntu-no-vsc:
+    type: boolean
+    default: false
+  ctdc-ccpp-debian-vsc:
+    type: boolean
+    default: false
+  ctdc-ccpp-fedora-vsc:
+    type: boolean
+    default: false
+  ctdc-ccpp-ubuntu-vsc:
+    type: boolean
+    default: false
 
 executors:
   vm-build-amd64:
@@ -72,10 +90,10 @@ jobs:
       - checkout
       - run :
           name: Build Docker image
-          command: cd $D_PATH/$FLAVOUR/$TAG && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG .
+          command: cd docker/$D_IMG/$FLAVOUR/$TAG && docker buildx build --platform $BUILDX_PLATFORMS -t $REPO/$D_IMG:$TAG-$FLAVOUR-$ARCH_TAG .
       - run :
           name: Publish Docker Image to Docker Hub
-          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG
+          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $REPO/$D_IMG:$TAG-$FLAVOUR-$ARCH_TAG
   
   DockerBuild-arm64:
       executor: vm-build-arm64
@@ -83,10 +101,10 @@ jobs:
       - checkout
       - run :
           name: Build Docker image
-          command: cd $D_PATH/$FLAVOUR/$TAG && docker buildx build --platform $BUILDX_PLATFORMS -t $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG .
+          command: cd docker/$D_IMG/$FLAVOUR/$TAG && docker buildx build --platform $BUILDX_PLATFORMS -t $REPO/$D_IMG:$TAG-$FLAVOUR-$ARCH_TAG .
       - run :
           name: Publish Docker Image to Docker Hub
-          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE_NAME:$TAG-$FLAVOUR-$ARCH_TAG
+          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $REPO/$D_IMG:$TAG-$FLAVOUR-$ARCH_TAG
 
   DockerPublish-multiarch:
       executor: docker-other
@@ -98,8 +116,8 @@ jobs:
             name: Publish MultiArch
             command: |
               export DOCKER_CLI_EXPERIMENTAL=enabled
-              docker manifest create $IMAGE_NAME:$TAG-$FLAVOUR $IMAGE_NAME:$TAG-$FLAVOUR-amd64 $IMAGE_NAME:$TAG-$FLAVOUR-arm64
-              docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker manifest push $IMAGE_NAME:$TAG-$FLAVOUR
+              docker manifest create $REPO/$D_IMG:$TAG-$FLAVOUR $REPO/$D_IMG:$TAG-$FLAVOUR-amd64 $REPO/$D_IMG:$TAG-$FLAVOUR-arm64
+              docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker manifest push $REPO/$D_IMG:$TAG-$FLAVOUR
               
   DeleteTempImage-amd64:
     executor: docker-other
@@ -112,7 +130,7 @@ jobs:
           command : |
             export TOKEN=`curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d '{"username": "'$DOCKER_LOGIN'", "password": "'$DOCKER_PASSWORD'"}' "https://hub.docker.com/v2/users/login/" | jq -r .token`
             echo $TOKEN
-            curl "https://hub.docker.com/v2/repositories/$IMAGE_NAME/tags/$TAG-$FLAVOUR-amd64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
+            curl "https://hub.docker.com/v2/repositories/$REPO/$D_IMG/tags/$TAG-$FLAVOUR-amd64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
 
   DeleteTempImage-arm64:
     executor: docker-other
@@ -125,7 +143,7 @@ jobs:
           command : |
             export TOKEN=`curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d '{"username": "'$DOCKER_LOGIN'", "password": "'$DOCKER_PASSWORD'"}' "https://hub.docker.com/v2/users/login/" | jq -r .token`
             echo $TOKEN
-            curl "https://hub.docker.com/v2/repositories/$IMAGE_NAME/tags/$TAG-$FLAVOUR-arm64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
+            curl "https://hub.docker.com/v2/repositories/$REPO/$D_IMG/tags/$TAG-$FLAVOUR-arm64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
   
 
 workflows:
@@ -620,4 +638,249 @@ workflows:
             - DockerHub
             - Ubuntu
             - ctdc-node
+            - vsc
+  ctdc-ccpp-debian-no-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-debian-no-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - no-vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - no-vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - no-vsc
+
+  ctdc-ccpp-fedora-no-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-fedora-no-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - no-vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - no-vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - no-vsc
+
+  ctdc-ccpp-ubuntu-no-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-ubuntu-no-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - no-vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - no-vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - no-vsc
+  
+  ctdc-ccpp-debian-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-debian-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - vsc
+  
+  ctdc-ccpp-fedora-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-fedora-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - vsc
+
+  ctdc-ccpp-ubuntu-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-ubuntu-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
             - vsc

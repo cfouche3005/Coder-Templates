@@ -1,0 +1,271 @@
+              docker/ctdc-ccpp/no-vsc/debian/Dockerfile ctdc-ccpp-debian-no-vsc true
+              docker/ctdc-ccpp/no-vsc/fedora/Dockerfile ctdc-ccpp-fedora-no-vsc true
+              docker/ctdc-ccpp/no-vsc/ubuntu/Dockerfile ctdc-ccpp-ubuntu-no-vsc true
+              docker/ctdc-ccpp/vsc/debian/Dockerfile ctdc-ccpp-debian-vsc true
+              docker/ctdc-ccpp/vsc/fedora/Dockerfile ctdc-ccpp-fedora-vsc true
+              docker/ctdc-ccpp/vsc/ubuntu/Dockerfile ctdc-ccpp-ubuntu-vsc true
+
+  ctdc-ccpp-debian-no-vsc:
+    type: boolean
+    default: false
+  ctdc-ccpp-fedora-no-vsc:
+    type: boolean
+    default: false
+  ctdc-ccpp-ubuntu-no-vsc:
+    type: boolean
+    default: false
+  ctdc-ccpp-debian-vsc:
+    type: boolean
+    default: false
+  ctdc-ccpp-fedora-vsc:
+    type: boolean
+    default: false
+  ctdc-ccpp-ubuntu-vsc:
+    type: boolean
+    default: false
+
+ctdc-ccpp-debian-no-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-debian-no-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - no-vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - no-vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - no-vsc
+
+  ctdc-ccpp-fedora-no-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-fedora-no-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - no-vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - no-vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - no-vsc
+
+  ctdc-ccpp-ubuntu-no-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-ubuntu-no-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - no-vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - no-vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - no-vsc
+  
+  ctdc-ccpp-debian-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-debian-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-ccpp
+            - vsc
+  
+  ctdc-ccpp-fedora-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-fedora-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-ccpp
+            - vsc
+
+  ctdc-ccpp-ubuntu-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-ubuntu-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-ccpp
+            - vsc

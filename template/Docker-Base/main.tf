@@ -2,11 +2,11 @@ terraform {
   required_providers {
     coder = {
       source  = "coder/coder"
-      version = "0.4.5"
+      version = "0.4.9"
     }
     docker = {
       source  = "kreuzwerker/docker"
-      version = "~> 2.20.2"
+      version = "~> 2.20.3"
     }
   }
 }
@@ -41,7 +41,7 @@ resource "coder_app" "code-server" {
   count = var.select_vsc ? 1 : 0
   agent_id = coder_agent.main.id
   name     = "code-server"
-  url      = "http://localhost:13337/?folder=/home/coder"
+  url      = "http://localhost:13337"
   icon     = "/icon/code.svg"
 }
 
