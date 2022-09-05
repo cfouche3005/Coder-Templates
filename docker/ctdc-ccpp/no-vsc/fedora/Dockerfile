@@ -9,7 +9,7 @@ RUN dnf -y update && \
     gdb \
     valgrind \
     g++ \
-    libc6-dev \
+    glibc-devel \
     make \
     && dnf clean all
 
