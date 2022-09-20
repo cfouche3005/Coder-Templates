@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd ..
+
 echo "Nom de l'image Docker"
 read img
 
