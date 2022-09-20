@@ -1,43 +1,43 @@
-              docker/ctdc-ccpp/no-vsc/debian/Dockerfile ctdc-ccpp-debian-no-vsc true
-              docker/ctdc-ccpp/no-vsc/fedora/Dockerfile ctdc-ccpp-fedora-no-vsc true
-              docker/ctdc-ccpp/no-vsc/ubuntu/Dockerfile ctdc-ccpp-ubuntu-no-vsc true
-              docker/ctdc-ccpp/vsc/debian/Dockerfile ctdc-ccpp-debian-vsc true
-              docker/ctdc-ccpp/vsc/fedora/Dockerfile ctdc-ccpp-fedora-vsc true
-              docker/ctdc-ccpp/vsc/ubuntu/Dockerfile ctdc-ccpp-ubuntu-vsc true
+              docker/ctdc-rust/no-vsc/debian/Dockerfile ctdc-rust-debian-no-vsc true
+              docker/ctdc-rust/no-vsc/fedora/Dockerfile ctdc-rust-fedora-no-vsc true
+              docker/ctdc-rust/no-vsc/ubuntu/Dockerfile ctdc-rust-ubuntu-no-vsc true
+              docker/ctdc-rust/vsc/debian/Dockerfile ctdc-rust-debian-vsc true
+              docker/ctdc-rust/vsc/fedora/Dockerfile ctdc-rust-fedora-vsc true
+              docker/ctdc-rust/vsc/ubuntu/Dockerfile ctdc-rust-ubuntu-vsc true
 
-  ctdc-ccpp-debian-no-vsc:
+  ctdc-rust-debian-no-vsc:
     type: boolean
     default: false
-  ctdc-ccpp-fedora-no-vsc:
+  ctdc-rust-fedora-no-vsc:
     type: boolean
     default: false
-  ctdc-ccpp-ubuntu-no-vsc:
+  ctdc-rust-ubuntu-no-vsc:
     type: boolean
     default: false
-  ctdc-ccpp-debian-vsc:
+  ctdc-rust-debian-vsc:
     type: boolean
     default: false
-  ctdc-ccpp-fedora-vsc:
+  ctdc-rust-fedora-vsc:
     type: boolean
     default: false
-  ctdc-ccpp-ubuntu-vsc:
+  ctdc-rust-ubuntu-vsc:
     type: boolean
     default: false
 
-ctdc-ccpp-debian-no-vsc:
-    when: << pipeline.parameters.ctdc-ccpp-debian-no-vsc >>
+ctdc-rust-debian-no-vsc:
+    when: << pipeline.parameters.ctdc-rust-debian-no-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
             - Debian
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
             - Debian
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
       - DockerPublish-multiarch :
           requires :
@@ -46,7 +46,7 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Debian
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
       - DeleteTempImage-amd64:
           requires:
@@ -54,7 +54,7 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Debian
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
       - DeleteTempImage-arm64:
           requires:
@@ -62,23 +62,23 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Debian
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
 
-  ctdc-ccpp-fedora-no-vsc:
-    when: << pipeline.parameters.ctdc-ccpp-fedora-no-vsc >>
+  ctdc-rust-fedora-no-vsc:
+    when: << pipeline.parameters.ctdc-rust-fedora-no-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
             - Fedora
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
             - Fedora
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
       - DockerPublish-multiarch :
           requires :
@@ -87,7 +87,7 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Fedora
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
       - DeleteTempImage-amd64:
           requires:
@@ -95,7 +95,7 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Fedora
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
       - DeleteTempImage-arm64:
           requires:
@@ -103,23 +103,23 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Fedora
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
 
-  ctdc-ccpp-ubuntu-no-vsc:
-    when: << pipeline.parameters.ctdc-ccpp-ubuntu-no-vsc >>
+  ctdc-rust-ubuntu-no-vsc:
+    when: << pipeline.parameters.ctdc-rust-ubuntu-no-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
       - DockerPublish-multiarch :
           requires :
@@ -128,7 +128,7 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
       - DeleteTempImage-amd64:
           requires:
@@ -136,7 +136,7 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
       - DeleteTempImage-arm64:
           requires:
@@ -144,23 +144,23 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-ccpp
+            - ctdc-rust
             - no-vsc
   
-  ctdc-ccpp-debian-vsc:
-    when: << pipeline.parameters.ctdc-ccpp-debian-vsc >>
+  ctdc-rust-debian-vsc:
+    when: << pipeline.parameters.ctdc-rust-debian-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
             - Debian
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
             - Debian
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
       - DockerPublish-multiarch :
           requires :
@@ -169,7 +169,7 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Debian
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
       - DeleteTempImage-amd64:
           requires:
@@ -177,7 +177,7 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Debian
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
       - DeleteTempImage-arm64:
           requires:
@@ -185,23 +185,23 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Debian
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
   
-  ctdc-ccpp-fedora-vsc:
-    when: << pipeline.parameters.ctdc-ccpp-fedora-vsc >>
+  ctdc-rust-fedora-vsc:
+    when: << pipeline.parameters.ctdc-rust-fedora-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
             - Fedora
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
             - Fedora
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
       - DockerPublish-multiarch :
           requires :
@@ -210,7 +210,7 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Fedora
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
       - DeleteTempImage-amd64:
           requires:
@@ -218,7 +218,7 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Fedora
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
       - DeleteTempImage-arm64:
           requires:
@@ -226,23 +226,23 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Fedora
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
 
-  ctdc-ccpp-ubuntu-vsc:
-    when: << pipeline.parameters.ctdc-ccpp-ubuntu-vsc >>
+  ctdc-rust-ubuntu-vsc:
+    when: << pipeline.parameters.ctdc-rust-ubuntu-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
       - DockerPublish-multiarch :
           requires :
@@ -251,7 +251,7 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
       - DeleteTempImage-amd64:
           requires:
@@ -259,7 +259,7 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc
       - DeleteTempImage-arm64:
           requires:
@@ -267,5 +267,5 @@ ctdc-ccpp-debian-no-vsc:
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-ccpp
+            - ctdc-rust
             - vsc

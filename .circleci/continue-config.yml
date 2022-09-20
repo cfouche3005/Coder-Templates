@@ -57,6 +57,24 @@ parameters:
   ctdc-ccpp-ubuntu-vsc:
     type: boolean
     default: false
+  ctdc-rust-debian-no-vsc:
+    type: boolean
+    default: false
+  ctdc-rust-fedora-no-vsc:
+    type: boolean
+    default: false
+  ctdc-rust-ubuntu-no-vsc:
+    type: boolean
+    default: false
+  ctdc-rust-debian-vsc:
+    type: boolean
+    default: false
+  ctdc-rust-fedora-vsc:
+    type: boolean
+    default: false
+  ctdc-rust-ubuntu-vsc:
+    type: boolean
+    default: false
 
 executors:
   vm-build-amd64:
@@ -883,4 +901,249 @@ workflows:
             - DockerHub
             - Ubuntu
             - ctdc-ccpp
+            - vsc
+  ctdc-rust-debian-no-vsc:
+    when: << pipeline.parameters.ctdc-rust-debian-no-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-rust
+            - no-vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-rust
+            - no-vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-rust
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-rust
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-rust
+            - no-vsc
+
+  ctdc-rust-fedora-no-vsc:
+    when: << pipeline.parameters.ctdc-rust-fedora-no-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-rust
+            - no-vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-rust
+            - no-vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-rust
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-rust
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-rust
+            - no-vsc
+
+  ctdc-rust-ubuntu-no-vsc:
+    when: << pipeline.parameters.ctdc-rust-ubuntu-no-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-rust
+            - no-vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-rust
+            - no-vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-rust
+            - no-vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-rust
+            - no-vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-rust
+            - no-vsc
+  
+  ctdc-rust-debian-vsc:
+    when: << pipeline.parameters.ctdc-rust-debian-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-rust
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-rust
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-rust
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-rust
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Debian
+            - ctdc-rust
+            - vsc
+  
+  ctdc-rust-fedora-vsc:
+    when: << pipeline.parameters.ctdc-rust-fedora-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-rust
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-rust
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-rust
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-rust
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Fedora
+            - ctdc-rust
+            - vsc
+
+  ctdc-rust-ubuntu-vsc:
+    when: << pipeline.parameters.ctdc-rust-ubuntu-vsc >>
+    jobs:
+      - DockerBuild-amd64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-rust
+            - vsc
+      - DockerBuild-arm64 :
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-rust
+            - vsc
+      - DockerPublish-multiarch :
+          requires :
+            - DockerBuild-arm64
+            - DockerBuild-amd64
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-rust
+            - vsc
+      - DeleteTempImage-amd64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-rust
+            - vsc
+      - DeleteTempImage-arm64:
+          requires:
+            - DockerPublish-multiarch
+          context : 
+            - DockerHub
+            - Ubuntu
+            - ctdc-rust
             - vsc
