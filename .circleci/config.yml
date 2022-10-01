@@ -35,6 +35,12 @@ workflows:
               docker/ctdc-rust/vsc/debian/Dockerfile ctdc-rust-debian-vsc true
               docker/ctdc-rust/vsc/fedora/Dockerfile ctdc-rust-fedora-vsc true
               docker/ctdc-rust/vsc/ubuntu/Dockerfile ctdc-rust-ubuntu-vsc true
+              docker/ctdc-python/no-vsc/debian/Dockerfile ctdc-python-debian-no-vsc true
+              docker/ctdc-python/no-vsc/fedora/Dockerfile ctdc-python-fedora-no-vsc true
+              docker/ctdc-python/no-vsc/ubuntu/Dockerfile ctdc-python-ubuntu-no-vsc true
+              docker/ctdc-python/vsc/debian/Dockerfile ctdc-python-debian-vsc true
+              docker/ctdc-python/vsc/fedora/Dockerfile ctdc-python-fedora-vsc true
+              docker/ctdc-python/vsc/ubuntu/Dockerfile ctdc-python-ubuntu-vsc true
           base-revision: main
           config-path: .circleci/continue-config.yml
   

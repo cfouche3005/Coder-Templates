@@ -1,43 +1,43 @@
-              docker/ctdc-rust/no-vsc/debian/Dockerfile ctdc-rust-debian-no-vsc true
-              docker/ctdc-rust/no-vsc/fedora/Dockerfile ctdc-rust-fedora-no-vsc true
-              docker/ctdc-rust/no-vsc/ubuntu/Dockerfile ctdc-rust-ubuntu-no-vsc true
-              docker/ctdc-rust/vsc/debian/Dockerfile ctdc-rust-debian-vsc true
-              docker/ctdc-rust/vsc/fedora/Dockerfile ctdc-rust-fedora-vsc true
-              docker/ctdc-rust/vsc/ubuntu/Dockerfile ctdc-rust-ubuntu-vsc true
+              docker/ctdc-python/no-vsc/debian/Dockerfile ctdc-python-debian-no-vsc true
+              docker/ctdc-python/no-vsc/fedora/Dockerfile ctdc-python-fedora-no-vsc true
+              docker/ctdc-python/no-vsc/ubuntu/Dockerfile ctdc-python-ubuntu-no-vsc true
+              docker/ctdc-python/vsc/debian/Dockerfile ctdc-python-debian-vsc true
+              docker/ctdc-python/vsc/fedora/Dockerfile ctdc-python-fedora-vsc true
+              docker/ctdc-python/vsc/ubuntu/Dockerfile ctdc-python-ubuntu-vsc true
 
-  ctdc-rust-debian-no-vsc:
+  ctdc-python-debian-no-vsc:
     type: boolean
     default: false
-  ctdc-rust-fedora-no-vsc:
+  ctdc-python-fedora-no-vsc:
     type: boolean
     default: false
-  ctdc-rust-ubuntu-no-vsc:
+  ctdc-python-ubuntu-no-vsc:
     type: boolean
     default: false
-  ctdc-rust-debian-vsc:
+  ctdc-python-debian-vsc:
     type: boolean
     default: false
-  ctdc-rust-fedora-vsc:
+  ctdc-python-fedora-vsc:
     type: boolean
     default: false
-  ctdc-rust-ubuntu-vsc:
+  ctdc-python-ubuntu-vsc:
     type: boolean
     default: false
 
-ctdc-rust-debian-no-vsc:
-    when: << pipeline.parameters.ctdc-rust-debian-no-vsc >>
+ctdc-python-debian-no-vsc:
+    when: << pipeline.parameters.ctdc-python-debian-no-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
             - Debian
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
             - Debian
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
       - DockerPublish-multiarch :
           requires :
@@ -46,7 +46,7 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Debian
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
       - DeleteTempImage-amd64:
           requires:
@@ -54,7 +54,7 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Debian
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
       - DeleteTempImage-arm64:
           requires:
@@ -62,23 +62,23 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Debian
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
 
-  ctdc-rust-fedora-no-vsc:
-    when: << pipeline.parameters.ctdc-rust-fedora-no-vsc >>
+  ctdc-python-fedora-no-vsc:
+    when: << pipeline.parameters.ctdc-python-fedora-no-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
             - Fedora
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
             - Fedora
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
       - DockerPublish-multiarch :
           requires :
@@ -87,7 +87,7 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Fedora
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
       - DeleteTempImage-amd64:
           requires:
@@ -95,7 +95,7 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Fedora
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
       - DeleteTempImage-arm64:
           requires:
@@ -103,23 +103,23 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Fedora
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
 
-  ctdc-rust-ubuntu-no-vsc:
-    when: << pipeline.parameters.ctdc-rust-ubuntu-no-vsc >>
+  ctdc-python-ubuntu-no-vsc:
+    when: << pipeline.parameters.ctdc-python-ubuntu-no-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
       - DockerPublish-multiarch :
           requires :
@@ -128,7 +128,7 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
       - DeleteTempImage-amd64:
           requires:
@@ -136,7 +136,7 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
       - DeleteTempImage-arm64:
           requires:
@@ -144,23 +144,23 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-rust
+            - ctdc-python
             - no-vsc
   
-  ctdc-rust-debian-vsc:
-    when: << pipeline.parameters.ctdc-rust-debian-vsc >>
+  ctdc-python-debian-vsc:
+    when: << pipeline.parameters.ctdc-python-debian-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
             - Debian
-            - ctdc-rust
+            - ctdc-python
             - vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
             - Debian
-            - ctdc-rust
+            - ctdc-python
             - vsc
       - DockerPublish-multiarch :
           requires :
@@ -169,7 +169,7 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Debian
-            - ctdc-rust
+            - ctdc-python
             - vsc
       - DeleteTempImage-amd64:
           requires:
@@ -177,7 +177,7 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Debian
-            - ctdc-rust
+            - ctdc-python
             - vsc
       - DeleteTempImage-arm64:
           requires:
@@ -185,23 +185,23 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Debian
-            - ctdc-rust
+            - ctdc-python
             - vsc
   
-  ctdc-rust-fedora-vsc:
-    when: << pipeline.parameters.ctdc-rust-fedora-vsc >>
+  ctdc-python-fedora-vsc:
+    when: << pipeline.parameters.ctdc-python-fedora-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
             - Fedora
-            - ctdc-rust
+            - ctdc-python
             - vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
             - Fedora
-            - ctdc-rust
+            - ctdc-python
             - vsc
       - DockerPublish-multiarch :
           requires :
@@ -210,7 +210,7 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Fedora
-            - ctdc-rust
+            - ctdc-python
             - vsc
       - DeleteTempImage-amd64:
           requires:
@@ -218,7 +218,7 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Fedora
-            - ctdc-rust
+            - ctdc-python
             - vsc
       - DeleteTempImage-arm64:
           requires:
@@ -226,23 +226,23 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Fedora
-            - ctdc-rust
+            - ctdc-python
             - vsc
 
-  ctdc-rust-ubuntu-vsc:
-    when: << pipeline.parameters.ctdc-rust-ubuntu-vsc >>
+  ctdc-python-ubuntu-vsc:
+    when: << pipeline.parameters.ctdc-python-ubuntu-vsc >>
     jobs:
       - DockerBuild-amd64 :
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-rust
+            - ctdc-python
             - vsc
       - DockerBuild-arm64 :
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-rust
+            - ctdc-python
             - vsc
       - DockerPublish-multiarch :
           requires :
@@ -251,7 +251,7 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-rust
+            - ctdc-python
             - vsc
       - DeleteTempImage-amd64:
           requires:
@@ -259,7 +259,7 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-rust
+            - ctdc-python
             - vsc
       - DeleteTempImage-arm64:
           requires:
@@ -267,5 +267,5 @@ ctdc-rust-debian-no-vsc:
           context : 
             - DockerHub
             - Ubuntu
-            - ctdc-rust
+            - ctdc-python
             - vsc
