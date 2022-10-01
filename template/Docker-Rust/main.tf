@@ -88,6 +88,7 @@ resource "docker_container" "workspace" {
   command = [
     "sh", "-c", replace(coder_agent.main.init_script, "localhost", "host.docker.internal")]
   env = ["CODER_AGENT_TOKEN=${coder_agent.main.token}"]
+  runtime = "sysbox-runc"
   host {
     host = "host.docker.internal"
     ip   = "host-gateway"
