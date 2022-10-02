@@ -75,6 +75,22 @@ locals {
 resource "docker_volume" "home_volume" {
   name = "coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}-home"
 }
+resource "docker_volume" "usr_volume" {
+  name = "coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}-usr"
+}
+resource "docker_volume" "var_volume" {
+  name = "coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}-var"
+}
+resource "docker_volume" "etc_volume" {
+  name = "coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}-etc"
+}
+resource "docker_volume" "opt_volume" {
+  name = "coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}-opt"
+}
+resource "docker_volume" "root_volume" {
+  name = "coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}-root"
+}
+
 
 resource "docker_container" "workspace" {
   count = data.coder_workspace.me.start_count
@@ -94,8 +110,33 @@ resource "docker_container" "workspace" {
     ip   = "host-gateway"
   }
   volumes {
-    container_path = "/home/coder/"
+    container_path = "/home/"
     volume_name    = docker_volume.home_volume.name
+    read_only      = false
+  }
+  volumes {
+    container_path = "/usr/"
+    volume_name    = docker_volume.usr_volume.name
+    read_only      = false
+  }
+  volumes {
+    container_path = "/var/"
+    volume_name    = docker_volume.var_volume.name
+    read_only      = false
+  }
+  volumes {
+    container_path = "/etc/"
+    volume_name    = docker_volume.etc_volume.name
+    read_only      = false
+  }
+  volumes {
+    container_path = "/opt/"
+    volume_name    = docker_volume.opt_volume.name
+    read_only      = false
+  }
+  volumes {
+    container_path = "/root/"
+    volume_name    = docker_volume.root_volume.name
     read_only      = false
   }
 }
