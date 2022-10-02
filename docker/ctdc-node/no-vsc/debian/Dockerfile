@@ -9,6 +9,8 @@ RUN apt-get update && \
     nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN ln -s / /save
+
 USER coder
 
 RUN curl -fsSL https://bun.sh/install | bash
