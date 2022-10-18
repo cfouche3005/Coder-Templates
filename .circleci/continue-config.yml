@@ -106,7 +106,7 @@ workflows:
           name : build-amd64-<< matrix.os >>
           matrix:
             parameters:
-              os : ["debian", "fedora","ubuntu"]
+              os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
             - ctdc-base
@@ -116,7 +116,7 @@ workflows:
           name : build-arm64-<< matrix.os >>
           matrix:
             parameters:
-              os : ["debian", "fedora","ubuntu"]
+              os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
             - ctdc-base
@@ -126,7 +126,7 @@ workflows:
           name : publish-<< matrix.os >>
           matrix:
             parameters:
-              os : ["debian", "fedora","ubuntu"]
+              os : ["debian","fedora","ubuntu"]
           requires :
             - build-arm64-<< matrix.os >>
             - build-amd64-<< matrix.os >>
@@ -136,10 +136,10 @@ workflows:
             - vanilla
 
       - DeleteTempImage:
-          name : build-amd64-<< matrix.os >>
+          name : clearTemp-<< matrix.os >>
           matrix:
             parameters:
-              os : ["debian", "fedora","ubuntu"]
+              os : ["debian","fedora","ubuntu"]
           requires:
             - publish-<< matrix.os >>
           context : 
