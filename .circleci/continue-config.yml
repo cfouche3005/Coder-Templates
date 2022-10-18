@@ -3,7 +3,16 @@
 version: 2.1
 
 parameters:
-  ctdc-base:
+  ctdc-base-vanilla:
+    type: boolean
+    default: false
+  ctdc-base-vsc:
+    type: boolean
+    default: false
+  ctdc-base-fleet:
+    type: boolean
+    default: false
+  ctdc-base-vsc-fleet:
     type: boolean
     default: false
 
