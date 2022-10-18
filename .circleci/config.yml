@@ -6,41 +6,12 @@ orbs:
   path-filtering: circleci/path-filtering@0.1.3
 
 workflows:
-  always-run-ctdc-base:
+  always-run:
     jobs:
       - path-filtering/filter:
           name: check-updated-file
           mapping: |          
-              docker/ctdc-base/no-vsc/debian/Dockerfile ctdc-base-debian-no-vsc true
-              docker/ctdc-base/no-vsc/fedora/Dockerfile ctdc-base-fedora-no-vsc true
-              docker/ctdc-base/no-vsc/ubuntu/Dockerfile ctdc-base-ubuntu-no-vsc true
-              docker/ctdc-base/vsc/debian/Dockerfile ctdc-base-debian-vsc true
-              docker/ctdc-base/vsc/fedora/Dockerfile ctdc-base-fedora-vsc true
-              docker/ctdc-base/vsc/ubuntu/Dockerfile ctdc-base-ubuntu-vsc true
-              docker/ctdc-node/no-vsc/debian/Dockerfile ctdc-node-debian-no-vsc true
-              docker/ctdc-node/no-vsc/fedora/Dockerfile ctdc-node-fedora-no-vsc true
-              docker/ctdc-node/no-vsc/ubuntu/Dockerfile ctdc-node-ubuntu-no-vsc true
-              docker/ctdc-node/vsc/debian/Dockerfile ctdc-node-debian-vsc true
-              docker/ctdc-node/vsc/fedora/Dockerfile ctdc-node-fedora-vsc true
-              docker/ctdc-node/vsc/ubuntu/Dockerfile ctdc-node-ubuntu-vsc true
-              docker/ctdc-ccpp/no-vsc/debian/Dockerfile ctdc-ccpp-debian-no-vsc true
-              docker/ctdc-ccpp/no-vsc/fedora/Dockerfile ctdc-ccpp-fedora-no-vsc true
-              docker/ctdc-ccpp/no-vsc/ubuntu/Dockerfile ctdc-ccpp-ubuntu-no-vsc true
-              docker/ctdc-ccpp/vsc/debian/Dockerfile ctdc-ccpp-debian-vsc true
-              docker/ctdc-ccpp/vsc/fedora/Dockerfile ctdc-ccpp-fedora-vsc true
-              docker/ctdc-ccpp/vsc/ubuntu/Dockerfile ctdc-ccpp-ubuntu-vsc true
-              docker/ctdc-rust/no-vsc/debian/Dockerfile ctdc-rust-debian-no-vsc true
-              docker/ctdc-rust/no-vsc/fedora/Dockerfile ctdc-rust-fedora-no-vsc true
-              docker/ctdc-rust/no-vsc/ubuntu/Dockerfile ctdc-rust-ubuntu-no-vsc true
-              docker/ctdc-rust/vsc/debian/Dockerfile ctdc-rust-debian-vsc true
-              docker/ctdc-rust/vsc/fedora/Dockerfile ctdc-rust-fedora-vsc true
-              docker/ctdc-rust/vsc/ubuntu/Dockerfile ctdc-rust-ubuntu-vsc true
-              docker/ctdc-python/no-vsc/debian/Dockerfile ctdc-python-debian-no-vsc true
-              docker/ctdc-python/no-vsc/fedora/Dockerfile ctdc-python-fedora-no-vsc true
-              docker/ctdc-python/no-vsc/ubuntu/Dockerfile ctdc-python-ubuntu-no-vsc true
-              docker/ctdc-python/vsc/debian/Dockerfile ctdc-python-debian-vsc true
-              docker/ctdc-python/vsc/fedora/Dockerfile ctdc-python-fedora-vsc true
-              docker/ctdc-python/vsc/ubuntu/Dockerfile ctdc-python-ubuntu-vsc true
+              docker/ctdc-base/* ctdc-base true
           base-revision: main
           config-path: .circleci/continue-config.yml
   
