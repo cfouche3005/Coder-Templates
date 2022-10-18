@@ -92,7 +92,7 @@ jobs:
             export TOKEN=`curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d '{"username": "'$DOCKER_LOGIN'", "password": "'$DOCKER_PASSWORD'"}' "https://hub.docker.com/v2/users/login/" | jq -r .token`
             echo $TOKEN
             curl "https://hub.docker.com/v2/repositories/$REPO/$D_IMG/tags/<< parameters.os >>-$FLAVOUR-amd64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
-            curl "https://hub.docker.com/v2/repositories/$REPO/$D_IMG/tags/$TAG-$FLAVOUR-arm64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
+            curl "https://hub.docker.com/v2/repositories/$REPO/$D_IMG/tags/<< parameters.os >>-$FLAVOUR-arm64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
 
   
 
@@ -146,3 +146,147 @@ workflows:
             - DockerHub
             - ctdc-base
             - vanilla
+  ctdc-base-vsc:
+    when: << pipeline.parameters.ctdc-base >>
+    jobs:
+
+      - DockerBuild-amd64 :
+          name : build-amd64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          context : 
+            - DockerHub
+            - ctdc-base
+            - vsc
+
+      - DockerBuild-arm64 :
+          name : build-arm64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          context : 
+            - DockerHub
+            - ctdc-base
+            - vsc
+
+      - DockerPublish-multiarch :
+          name : publish-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          requires :
+            - build-arm64-<< matrix.os >>
+            - build-amd64-<< matrix.os >>
+          context : 
+            - DockerHub
+            - ctdc-base
+            - vsc
+
+      - DeleteTempImage:
+          name : clearTemp-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          requires:
+            - publish-<< matrix.os >>
+          context : 
+            - DockerHub
+            - ctdc-base
+            - vsc
+  ctdc-base-fleet:
+    when: << pipeline.parameters.ctdc-base >>
+    jobs:
+
+      - DockerBuild-amd64 :
+          name : build-amd64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          context : 
+            - DockerHub
+            - ctdc-base
+            - fleet
+
+      - DockerBuild-arm64 :
+          name : build-arm64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          context : 
+            - DockerHub
+            - ctdc-base
+            - fleet
+
+      - DockerPublish-multiarch :
+          name : publish-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          requires :
+            - build-arm64-<< matrix.os >>
+            - build-amd64-<< matrix.os >>
+          context : 
+            - DockerHub
+            - ctdc-base
+            - fleet
+
+      - DeleteTempImage:
+          name : clearTemp-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          requires:
+            - publish-<< matrix.os >>
+          context : 
+            - DockerHub
+            - ctdc-base
+            - fleet
+  ctdc-base-vsc-fleet:
+    when: << pipeline.parameters.ctdc-base >>
+    jobs:
+
+      - DockerBuild-amd64 :
+          name : build-amd64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          context : 
+            - DockerHub
+            - ctdc-base
+            - vsc-fleet
+
+      - DockerBuild-arm64 :
+          name : build-arm64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          context : 
+            - DockerHub
+            - ctdc-base
+            - vsc-fleet
+
+      - DockerPublish-multiarch :
+          name : publish-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          requires :
+            - build-arm64-<< matrix.os >>
+            - build-amd64-<< matrix.os >>
+          context : 
+            - DockerHub
+            - ctdc-base
+            - vsc-fleet
+
+      - DeleteTempImage:
+          name : clearTemp-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          requires:
+            - publish-<< matrix.os >>
+          context : 
+            - DockerHub
+            - ctdc-base
+            - vsc-fleet

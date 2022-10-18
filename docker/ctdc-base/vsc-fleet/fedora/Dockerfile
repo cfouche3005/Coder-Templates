@@ -1,4 +1,4 @@
-FROM fedora:36
+FROM fedora:latest
 
 SHELL ["/bin/bash", "-c"]
 
@@ -17,6 +17,10 @@ RUN dnf -y update && \
     wget \
     git \
     && dnf clean all
+
+RUN curl -fsSL https://code-server.dev/install.sh | sh && dnf clean all
+
+RUN if [ "$(uname -m)" == "aarch64" ]; then curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=eap&platform=linux_aarch64" --output fleet && chmod +x fleet; else curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=eap&platform=linux_x64" --output fleet && chmod +x fleet;
 
 RUN useradd coder \
       --create-home \

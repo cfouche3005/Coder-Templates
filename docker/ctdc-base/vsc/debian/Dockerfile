@@ -1,4 +1,4 @@
-FROM debian:sid-slim
+FROM debian:testing-slim
 
 SHELL ["/bin/bash", "-c"]
 
