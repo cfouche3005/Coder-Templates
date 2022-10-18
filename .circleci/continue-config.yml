@@ -99,7 +99,7 @@ jobs:
 workflows:
 
   ctdc-base-vanilla:
-    when: << pipeline.parameters.ctdc-base >>
+    when: << pipeline.parameters.ctdc-base-vanilla >>
     jobs:
 
       - DockerBuild-amd64 :
@@ -147,7 +147,7 @@ workflows:
             - ctdc-base
             - vanilla
   ctdc-base-vsc:
-    when: << pipeline.parameters.ctdc-base >>
+    when: << pipeline.parameters.ctdc-base-vsc >>
     jobs:
 
       - DockerBuild-amd64 :
@@ -195,7 +195,7 @@ workflows:
             - ctdc-base
             - vsc
   ctdc-base-fleet:
-    when: << pipeline.parameters.ctdc-base >>
+    when: << pipeline.parameters.ctdc-base-fleet >>
     jobs:
 
       - DockerBuild-amd64 :
@@ -243,7 +243,7 @@ workflows:
             - ctdc-base
             - fleet
   ctdc-base-vsc-fleet:
-    when: << pipeline.parameters.ctdc-base >>
+    when: << pipeline.parameters.ctdc-base-vsc-fleet >>
     jobs:
 
       - DockerBuild-amd64 :
