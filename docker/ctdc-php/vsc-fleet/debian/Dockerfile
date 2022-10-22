@@ -9,11 +9,11 @@ RUN apt-get update && \
     libapache2-mod-php \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /var/ww/html/info
-RUN echo "<?php" >> /var/ww/html/info/info.php && \
-    echo "  phpinfo();" >> /var/ww/html/info/info.php && \
-    echo "?>" >> /var/ww/html/info/info.php
-RUN chown -R coder /var/ww/html
+RUN mkdir /var/www/html/info
+RUN echo "<?php" >> /var/www/html/info/info.php && \
+    echo "  phpinfo();" >> /var/www/html/info/info.php && \
+    echo "?>" >> /var/www/html/info/info.php
+RUN chown -R coder /var/www/html
 
 USER coder
 
