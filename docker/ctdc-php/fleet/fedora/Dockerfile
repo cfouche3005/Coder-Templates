@@ -4,9 +4,8 @@ USER root
 
 RUN dnf -y update && \
     dnf -y install --setopt=install_weak_deps=False \
-    apache2 \
-    php \
-    libapache2-mod-php \
+    httpd \
+    php-fpm \
     && dnf clean all
 
 RUN mkdir /var/www/html/info
