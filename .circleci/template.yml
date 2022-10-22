@@ -1,271 +1,197 @@
-              docker/ctdc-python/no-vsc/debian/Dockerfile ctdc-python-debian-no-vsc true
-              docker/ctdc-python/no-vsc/fedora/Dockerfile ctdc-python-fedora-no-vsc true
-              docker/ctdc-python/no-vsc/ubuntu/Dockerfile ctdc-python-ubuntu-no-vsc true
-              docker/ctdc-python/vsc/debian/Dockerfile ctdc-python-debian-vsc true
-              docker/ctdc-python/vsc/fedora/Dockerfile ctdc-python-fedora-vsc true
-              docker/ctdc-python/vsc/ubuntu/Dockerfile ctdc-python-ubuntu-vsc true
+              docker/ctdc-ccpp/vanilla/.* ctdc-ccpp-vanilla true
+              docker/ctdc-ccpp/vsc/.* ctdc-ccpp-vsc true
+              docker/ctdc-ccpp/fleet/.* ctdc-ccpp-fleet true
+              docker/ctdc-ccpp/vsc-fleet/.* ctdc-ccpp-vsc-fleet true
 
-  ctdc-python-debian-no-vsc:
+  ctdc-ccpp-vanilla:
     type: boolean
     default: false
-  ctdc-python-fedora-no-vsc:
+  ctdc-ccpp-vsc:
     type: boolean
     default: false
-  ctdc-python-ubuntu-no-vsc:
+  ctdc-ccpp-fleet:
     type: boolean
     default: false
-  ctdc-python-debian-vsc:
-    type: boolean
-    default: false
-  ctdc-python-fedora-vsc:
-    type: boolean
-    default: false
-  ctdc-python-ubuntu-vsc:
+  ctdc-ccpp-vsc-fleet:
     type: boolean
     default: false
 
-ctdc-python-debian-no-vsc:
-    when: << pipeline.parameters.ctdc-python-debian-no-vsc >>
+ctdc-ccpp-vanilla:
+    when: << pipeline.parameters.ctdc-ccpp-vanilla >>
     jobs:
       - DockerBuild-amd64 :
+          name : build-amd64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - Debian
-            - ctdc-python
-            - no-vsc
+            - ctdc-ccpp
+            - vanilla
       - DockerBuild-arm64 :
+          name : build-arm64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - Debian
-            - ctdc-python
-            - no-vsc
+            - ctdc-ccpp
+            - vanilla
       - DockerPublish-multiarch :
+          name : publish-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           requires :
-            - DockerBuild-arm64
-            - DockerBuild-amd64
+            - build-arm64-<< matrix.os >>
+            - build-amd64-<< matrix.os >>
           context : 
             - DockerHub
-            - Debian
-            - ctdc-python
-            - no-vsc
-      - DeleteTempImage-amd64:
+            - ctdc-ccpp
+            - vanilla
+      - DeleteTempImage:
+          name : clearTemp-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           requires:
-            - DockerPublish-multiarch
+            - publish-<< matrix.os >>
           context : 
             - DockerHub
-            - Debian
-            - ctdc-python
-            - no-vsc
-      - DeleteTempImage-arm64:
-          requires:
-            - DockerPublish-multiarch
-          context : 
-            - DockerHub
-            - Debian
-            - ctdc-python
-            - no-vsc
+            - ctdc-ccpp
+            - vanilla
 
-  ctdc-python-fedora-no-vsc:
-    when: << pipeline.parameters.ctdc-python-fedora-no-vsc >>
+  ctdc-ccpp-vsc:
+    when: << pipeline.parameters.ctdc-ccpp-vsc >>
     jobs:
       - DockerBuild-amd64 :
+          name : build-amd64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - Fedora
-            - ctdc-python
-            - no-vsc
-      - DockerBuild-arm64 :
-          context : 
-            - DockerHub
-            - Fedora
-            - ctdc-python
-            - no-vsc
-      - DockerPublish-multiarch :
-          requires :
-            - DockerBuild-arm64
-            - DockerBuild-amd64
-          context : 
-            - DockerHub
-            - Fedora
-            - ctdc-python
-            - no-vsc
-      - DeleteTempImage-amd64:
-          requires:
-            - DockerPublish-multiarch
-          context : 
-            - DockerHub
-            - Fedora
-            - ctdc-python
-            - no-vsc
-      - DeleteTempImage-arm64:
-          requires:
-            - DockerPublish-multiarch
-          context : 
-            - DockerHub
-            - Fedora
-            - ctdc-python
-            - no-vsc
-
-  ctdc-python-ubuntu-no-vsc:
-    when: << pipeline.parameters.ctdc-python-ubuntu-no-vsc >>
-    jobs:
-      - DockerBuild-amd64 :
-          context : 
-            - DockerHub
-            - Ubuntu
-            - ctdc-python
-            - no-vsc
-      - DockerBuild-arm64 :
-          context : 
-            - DockerHub
-            - Ubuntu
-            - ctdc-python
-            - no-vsc
-      - DockerPublish-multiarch :
-          requires :
-            - DockerBuild-arm64
-            - DockerBuild-amd64
-          context : 
-            - DockerHub
-            - Ubuntu
-            - ctdc-python
-            - no-vsc
-      - DeleteTempImage-amd64:
-          requires:
-            - DockerPublish-multiarch
-          context : 
-            - DockerHub
-            - Ubuntu
-            - ctdc-python
-            - no-vsc
-      - DeleteTempImage-arm64:
-          requires:
-            - DockerPublish-multiarch
-          context : 
-            - DockerHub
-            - Ubuntu
-            - ctdc-python
-            - no-vsc
-  
-  ctdc-python-debian-vsc:
-    when: << pipeline.parameters.ctdc-python-debian-vsc >>
-    jobs:
-      - DockerBuild-amd64 :
-          context : 
-            - DockerHub
-            - Debian
-            - ctdc-python
+            - ctdc-ccpp
             - vsc
       - DockerBuild-arm64 :
+          name : build-arm64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - Debian
-            - ctdc-python
+            - ctdc-ccpp
             - vsc
       - DockerPublish-multiarch :
+          name : publish-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           requires :
-            - DockerBuild-arm64
-            - DockerBuild-amd64
+            - build-arm64-<< matrix.os >>
+            - build-amd64-<< matrix.os >>
           context : 
             - DockerHub
-            - Debian
-            - ctdc-python
+            - ctdc-ccpp
             - vsc
-      - DeleteTempImage-amd64:
+      - DeleteTempImage:
+          name : clearTemp-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           requires:
-            - DockerPublish-multiarch
+            - publish-<< matrix.os >>
           context : 
             - DockerHub
-            - Debian
-            - ctdc-python
-            - vsc
-      - DeleteTempImage-arm64:
-          requires:
-            - DockerPublish-multiarch
-          context : 
-            - DockerHub
-            - Debian
-            - ctdc-python
-            - vsc
-  
-  ctdc-python-fedora-vsc:
-    when: << pipeline.parameters.ctdc-python-fedora-vsc >>
-    jobs:
-      - DockerBuild-amd64 :
-          context : 
-            - DockerHub
-            - Fedora
-            - ctdc-python
-            - vsc
-      - DockerBuild-arm64 :
-          context : 
-            - DockerHub
-            - Fedora
-            - ctdc-python
-            - vsc
-      - DockerPublish-multiarch :
-          requires :
-            - DockerBuild-arm64
-            - DockerBuild-amd64
-          context : 
-            - DockerHub
-            - Fedora
-            - ctdc-python
-            - vsc
-      - DeleteTempImage-amd64:
-          requires:
-            - DockerPublish-multiarch
-          context : 
-            - DockerHub
-            - Fedora
-            - ctdc-python
-            - vsc
-      - DeleteTempImage-arm64:
-          requires:
-            - DockerPublish-multiarch
-          context : 
-            - DockerHub
-            - Fedora
-            - ctdc-python
+            - ctdc-ccpp
             - vsc
 
-  ctdc-python-ubuntu-vsc:
-    when: << pipeline.parameters.ctdc-python-ubuntu-vsc >>
+  ctdc-ccpp-fleet:
+    when: << pipeline.parameters.ctdc-ccpp-fleet >>
     jobs:
       - DockerBuild-amd64 :
+          name : build-amd64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - Ubuntu
-            - ctdc-python
-            - vsc
+            - ctdc-ccpp
+            - fleet
       - DockerBuild-arm64 :
+          name : build-arm64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - Ubuntu
-            - ctdc-python
-            - vsc
+            - ctdc-ccpp
+            - fleet
       - DockerPublish-multiarch :
+          name : publish-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           requires :
-            - DockerBuild-arm64
-            - DockerBuild-amd64
+            - build-arm64-<< matrix.os >>
+            - build-amd64-<< matrix.os >>
           context : 
             - DockerHub
-            - Ubuntu
-            - ctdc-python
-            - vsc
-      - DeleteTempImage-amd64:
+            - ctdc-ccpp
+            - fleet
+      - DeleteTempImage:
+          name : clearTemp-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           requires:
-            - DockerPublish-multiarch
+            - publish-<< matrix.os >>
           context : 
             - DockerHub
-            - Ubuntu
-            - ctdc-python
-            - vsc
-      - DeleteTempImage-arm64:
+            - ctdc-ccpp
+            - fleet
+
+  ctdc-ccpp-vsc-fleet:
+    when: << pipeline.parameters.ctdc-ccpp-vsc-fleet >>
+    jobs:
+      - DockerBuild-amd64 :
+          name : build-amd64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          context : 
+            - DockerHub
+            - ctdc-ccpp
+            - vsc-fleet
+      - DockerBuild-arm64 :
+          name : build-arm64-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          context : 
+            - DockerHub
+            - ctdc-ccpp
+            - vsc-fleet
+      - DockerPublish-multiarch :
+          name : publish-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
+          requires :
+            - build-arm64-<< matrix.os >>
+            - build-amd64-<< matrix.os >>
+          context : 
+            - DockerHub
+            - ctdc-ccpp
+            - vsc-fleet
+      - DeleteTempImage:
+          name : clearTemp-<< matrix.os >>
+          matrix:
+            parameters:
+              os : ["debian","fedora","ubuntu"]
           requires:
-            - DockerPublish-multiarch
+            - publish-<< matrix.os >>
           context : 
             - DockerHub
-            - Ubuntu
-            - ctdc-python
-            - vsc
+            - ctdc-ccpp
+            - vsc-fleet

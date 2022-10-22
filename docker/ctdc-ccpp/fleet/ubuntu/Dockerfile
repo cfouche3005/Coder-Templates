@@ -1,4 +1,4 @@
-FROM cf3005/ctdc-base:debian-no-vsc
+FROM cf3005/ctdc-base:ubuntu-fleet
 
 USER root
 

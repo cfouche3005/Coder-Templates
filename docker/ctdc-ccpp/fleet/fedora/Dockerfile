@@ -1,4 +1,4 @@
-FROM cf3005/ctdc-base:fedora-vsc
+FROM cf3005/ctdc-base:fedora-fleet
 
 USER root
 
@@ -15,4 +15,4 @@ RUN dnf -y update && \
 
 USER coder
 
-#b
+#a

@@ -1,4 +1,4 @@
-FROM cf3005/ctdc-base:fedora-vsc
+FROM cf3005/ctdc-base:fedora-vsc-fleet
 
 USER root
 
