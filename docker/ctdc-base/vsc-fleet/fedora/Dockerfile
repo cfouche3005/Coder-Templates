@@ -20,7 +20,7 @@ RUN dnf -y update && \
 
 RUN curl -fsSL https://code-server.dev/install.sh | sh && dnf clean all
 
-RUN cd /bin && if [ "$(uname -m)" == "aarch64" ]; then curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=eap&platform=linux_aarch64" --output fleet && chmod +x fleet; else curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=eap&platform=linux_x64" --output fleet && chmod +x fleet; fi;
+RUN cd /usr/bin && if [ "$(uname -m)" == "aarch64" ]; then curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=eap&platform=linux_aarch64" --output fleet && chmod +x fleet; else curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=eap&platform=linux_x64" --output fleet && chmod +x fleet; fi;
 
 RUN useradd coder \
       --create-home \

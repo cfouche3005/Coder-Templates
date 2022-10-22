@@ -121,17 +121,19 @@ resource "coder_agent" "main" {
 resource "coder_app" "code-server" {
   count = local.software[var.select_ide].count_vsc
   agent_id = coder_agent.main.id
-  name     = "code-server"
+  slug     = "code-server"
   url      = "http://localhost:13337"
   icon     = "/icon/code.svg"
+  display_name = "Visual Code Studio"
 }
 
 resource "coder_app" "fleet" {
   count = local.software[var.select_ide].count_fleet
   agent_id = coder_agent.main.id
-  name     = "code-server"
+  slug     = "fleet"
   url      = "http://localhost:13347"
-  icon     = "/icon/code.svg"
+  icon     = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/fleet.png"
+  display_name = "Fleet"
 }
 
 #Docker Image Resource
