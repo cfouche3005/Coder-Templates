@@ -15,6 +15,10 @@ workflows:
               docker/ctdc-base/vsc/.* ctdc-base-vsc true
               docker/ctdc-base/fleet/.* ctdc-base-fleet true
               docker/ctdc-base/vsc-fleet/.* ctdc-base-vsc-fleet true
+              docker/ctdc-node/vanilla/.* ctdc-node-vanilla true
+              docker/ctdc-node/vsc/.* ctdc-node-vsc true
+              docker/ctdc-node/fleet/.* ctdc-node-fleet true
+              docker/ctdc-node/vsc-fleet/.* ctdc-node-vsc-fleet true
           base-revision: main
           config-path: .circleci/continue-config.yml
   

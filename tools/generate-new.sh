@@ -1,5 +1,14 @@
 #!/bin/sh
 
+IDE[0]="vanilla"
+IDE[1]="vsc"
+IDE[2]="fleet"
+IDE[3]="vsc-fleet"
+
+OS[0]="debian"
+OS[1]="ubuntu"
+OS[2]="fedora"
+
 cd ..
 
 echo "Nom de l'image Docker"
@@ -11,26 +20,19 @@ read tpl
 cd docker
 
 mkdir $img
-mkdir $img/no-vsc
-mkdir $img/vsc
+cd $img
 
-mkdir $img/no-vsc/debian
-mkdir $img/no-vsc/fedora
-mkdir $img/no-vsc/ubuntu
+for ide in ${IDE[@]} ; do 
+    mkdir $ide
+    cd $ide
+    for os in ${OS[@]} ; do
+        mkdir $os
+        touch $os/Dockerfile
+    done
+    cd ..
+done
 
-mkdir $img/vsc/debian
-mkdir $img/vsc/fedora
-mkdir $img/vsc/ubuntu
-
-touch $img/no-vsc/debian/Dockerfile
-touch $img/no-vsc/fedora/Dockerfile
-touch $img/no-vsc/ubuntu/Dockerfile
-
-touch $img/vsc/debian/Dockerfile
-touch $img/vsc/fedora/Dockerfile
-touch $img/vsc/ubuntu/Dockerfile
-
-cd ../template
+cd ../../template
 
 mkdir $tpl
 

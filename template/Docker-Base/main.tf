@@ -19,7 +19,7 @@ data "coder_workspace" "me" {
 }
 
 data "docker_registry_image" "docker_image" {
-  name = "cf3005/ctdc-base:${var.docker_os}-%{ if var.select_vsc == true }vsc%{ else }no-vsc%{ endif }"
+  name = "cf3005/ctdc-base:${var.docker_os}-${local.software[var.select_ide].tag}"
 }
 
 
@@ -51,28 +51,60 @@ variable "docker_os" {
   }
 }
 
-variable "select_vsc" {
-  type = bool
-  description = "Do you want to have Visual Studio Code server installed"
-  default = false
+variable "select_ide" {
+  description = "What IDE do you want to be installed"
+  default = "none"
+  validation {
+    condition = contains(["none","vsc","fleet","vsc-fleet"], var.select_ide)
+    error_message = "Invalid IDE"
+  }
 }
 
 locals {
-  no-vsc = <<EOF
-    #!/bin/sh
-    #install and start code-server
-    #code-server --auth none --port 13337
-    EOF
-  vsc = <<EOF
-    !/bin/sh
-    code-server --auth none --port 13337
-    EOF
+  software = {
+    "none" = {
+      "tag" = "vanilla"
+      "count_vsc" = 0
+      "count_fleet" = 0
+      "startup_script" = <<EOF
+    
+       EOF
+    },
+    "vsc" = {
+      "tag" = "vsc"
+      "count_vsc" = 1
+      "count_fleet" = 0
+      "startup_script" = <<EOF
+        !/bin/sh
+        code-server --auth none --port 13337
+        EOF
+    },
+    "fleet" = {
+      "tag" = "fleet"
+      "count_vsc" = 0
+      "count_fleet" = 1
+      "startup_script" = <<EOF
+        !/bin/sh
+        fleet launch workspace --auth=accept-everyone --publish --enableSmartMode --workspacePort 13347
+        EOF
+    }
+    "vsc-fleet" = {
+      "tag" = "vsc-fleet"
+      "count_vsc" = 1
+      "count_fleet" = 1
+      "startup_script" = <<EOF
+        !/bin/sh
+        code-server --auth none --port 13337
+        fleet launch workspace --auth=accept-everyone --publish --enableSmartMode --workspacePort 13347
+        EOF
+    }
+  }
 }
 
 resource "coder_agent" "main" {
   arch           = var.docker_host_arch
   os             = "linux"
-  startup_script = var.select_vsc ? local.vsc : local.no-vsc
+  startup_script = local.software[var.select_ide].startup_script
 
   # These environment variables allow you to make Git commits right away after creating a
   # workspace. Note that they take precedence over configuration defined in ~/.gitconfig!
@@ -87,10 +119,18 @@ resource "coder_agent" "main" {
 }
 
 resource "coder_app" "code-server" {
-  count = var.select_vsc ? 1 : 0
+  count = local.software[var.select_ide].count_vsc
   agent_id = coder_agent.main.id
   name     = "code-server"
   url      = "http://localhost:13337"
+  icon     = "/icon/code.svg"
+}
+
+resource "coder_app" "fleet" {
+  count = local.software[var.select_ide].count_fleet
+  agent_id = coder_agent.main.id
+  name     = "code-server"
+  url      = "http://localhost:13347"
   icon     = "/icon/code.svg"
 }
 
