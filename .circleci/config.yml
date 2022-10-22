@@ -23,6 +23,10 @@ workflows:
               docker/ctdc-ccpp/vsc/.* ctdc-ccpp-vsc true
               docker/ctdc-ccpp/fleet/.* ctdc-ccpp-fleet true
               docker/ctdc-ccpp/vsc-fleet/.* ctdc-ccpp-vsc-fleet true
+              docker/ctdc-php/vanilla/.* ctdc-php-vanilla true
+              docker/ctdc-php/vsc/.* ctdc-php-vsc true
+              docker/ctdc-php/fleet/.* ctdc-php-fleet true
+              docker/ctdc-php/vsc-fleet/.* ctdc-php-vsc-fleet true
           base-revision: main
           config-path: .circleci/continue-config.yml
   
