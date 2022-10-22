@@ -300,8 +300,8 @@ workflows:
             - vsc-fleet
 
 
-    ctdc-base-vanilla:
-    when: << pipeline.parameters.ctdc-base-vanilla >>
+  ctdc-node-vanilla:
+    when: << pipeline.parameters.ctdc-node-vanilla >>
     jobs:
       - DockerBuild-amd64 :
           name : build-amd64-<< matrix.os >>
@@ -310,7 +310,7 @@ workflows:
               os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - ctdc-base
+            - ctdc-node
             - vanilla
       - DockerBuild-arm64 :
           name : build-arm64-<< matrix.os >>
@@ -319,7 +319,7 @@ workflows:
               os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - ctdc-base
+            - ctdc-node
             - vanilla
       - DockerPublish-multiarch :
           name : publish-<< matrix.os >>
@@ -331,7 +331,7 @@ workflows:
             - build-amd64-<< matrix.os >>
           context : 
             - DockerHub
-            - ctdc-base
+            - ctdc-node
             - vanilla
       - DeleteTempImage:
           name : clearTemp-<< matrix.os >>
@@ -342,7 +342,7 @@ workflows:
             - publish-<< matrix.os >>
           context : 
             - DockerHub
-            - ctdc-base
+            - ctdc-node
             - vanilla
 
   ctdc-node-vsc:
