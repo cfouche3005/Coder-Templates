@@ -12,6 +12,7 @@ RUN apt-get update && \
       sudo \
       systemd \
       systemd-sysv \
+      dbus \
       unzip \
       nano \
       zsh \
