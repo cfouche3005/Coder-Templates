@@ -11,12 +11,25 @@ RUN dnf -y update && \
     sudo \
     systemd \
     systemd-sysv \
+    dbus \
     unzip \
     nano \
     zsh \
     wget \
     git \
     && dnf clean all
+
+RUN systemctl mask systemd-udevd.service \
+                   systemd-udevd-kernel.socket \
+                   systemd-udevd-control.socket \
+                   systemd-modules-load.service \
+                   sys-kernel-config.mount \
+                   sys-kernel-debug.mount \
+                   sys-kernel-tracing.mount\
+                   systemd-journald-audit.socket \
+                   systemd-udev-trigger.service \
+                   systemd-firstboot.service \
+                   systemd-networkd-wait-online.service
 
 RUN useradd coder \
       --create-home \

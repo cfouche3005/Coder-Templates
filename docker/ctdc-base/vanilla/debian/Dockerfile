@@ -20,6 +20,18 @@ RUN apt-get update && \
       git \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN systemctl mask systemd-udevd.service \
+                   systemd-udevd-kernel.socket \
+                   systemd-udevd-control.socket \
+                   systemd-modules-load.service \
+                   sys-kernel-config.mount \
+                   sys-kernel-debug.mount \
+                   sys-kernel-tracing.mount\
+                   systemd-journald-audit.socket \
+                   systemd-udev-trigger.service \
+                   systemd-firstboot.service \
+                   systemd-networkd-wait-online.service
+
 RUN useradd coder \
       --create-home \
       --shell=/bin/zsh \

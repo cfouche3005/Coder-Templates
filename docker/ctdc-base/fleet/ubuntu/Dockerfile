@@ -12,12 +12,25 @@ RUN apt-get update && \
       sudo \
       systemd \
       systemd-sysv \
+      dbus \
       unzip \
       nano \
       zsh \
       wget \
       git \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN systemctl mask systemd-udevd.service \
+                   systemd-udevd-kernel.socket \
+                   systemd-udevd-control.socket \
+                   systemd-modules-load.service \
+                   sys-kernel-config.mount \
+                   sys-kernel-debug.mount \
+                   sys-kernel-tracing.mount\
+                   systemd-journald-audit.socket \
+                   systemd-udev-trigger.service \
+                   systemd-firstboot.service \
+                   systemd-networkd-wait-online.service
 
 RUN cd /usr/bin && if [ "$(uname -m)" == "aarch64" ]; then curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=eap&platform=linux_aarch64" --output fleet && chmod +x fleet; else curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=eap&platform=linux_x64" --output fleet && chmod +x fleet; fi;
 

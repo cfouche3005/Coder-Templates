@@ -24,21 +24,21 @@ data "docker_registry_image" "docker_image" {
 
 
 # Variable
-variable "docker_host" {
-  description = "Address of the Docker host ([unix://], [ssh://], [tcp://])"
-  default = "unix:///var/run/docker.sock"
-  validation {
-    condition     = can(regex("(unix://)|(tcp://)|(ssh://)", var.docker_host))
-    error_message = "Invalid Docker Host !"
-  }
-}
-
 variable "docker_host_arch" {
   description = "CPU architecture of the Docker host"
   default = "amd64"
   validation {
     condition = contains(["amd64","arm64"], var.docker_host_arch)
     error_message = "Invalid Docker CPU architecture !"
+  }
+}
+
+variable "docker_host" {
+  description = "Address of the Docker host ([unix://], [ssh://], [tcp://])"
+  default = "unix:///var/run/docker.sock"
+  validation {
+    condition     = can(regex("(unix://)|(tcp://)|(ssh://)", var.docker_host))
+    error_message = "Invalid Docker Host !"
   }
 }
 
@@ -95,7 +95,7 @@ locals {
       "startup_script" = <<EOF
         !/bin/sh
         code-server --auth none --port 13337
-        fleet launch workspace --auth=accept-everyone --publish --enableSmartMode --workspacePort 13347
+        /usr/bin/fleet launch workspace -- --auth=accept-everyone --publish --enableSmartMode --workspacePort 13347
         EOF
     }
   }
@@ -121,17 +121,19 @@ resource "coder_agent" "main" {
 resource "coder_app" "code-server" {
   count = local.software[var.select_ide].count_vsc
   agent_id = coder_agent.main.id
-  name     = "code-server"
+  slug     = "code-server"
   url      = "http://localhost:13337"
   icon     = "/icon/code.svg"
+  display_name = "Visual Code Studio"
 }
 
 resource "coder_app" "fleet" {
   count = local.software[var.select_ide].count_fleet
   agent_id = coder_agent.main.id
-  name     = "code-server"
-  url      = "http://localhost:13347"
-  icon     = "/icon/code.svg"
+  slug     = "fleet"
+  command  = "fleet launch workspace -- --auth=accept-everyone --publish --enableSmartMode --workspacePort 13347"
+  icon     = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/fleet.png"
+  display_name = "Fleet"
 }
 
 #Docker Image Resource
@@ -239,8 +241,25 @@ resource "docker_container" "workspace" {
   hostname = lower(data.coder_workspace.me.name)
   dns      = ["1.1.1.1"]
   # Use the docker gateway if the access URL is 127.0.0.1
-  command = [
-    "sh", "-c", replace(coder_agent.main.init_script, "localhost", "host.docker.internal")]
+  user    = "0:0"
+
+  # Start systemd and the Coder agent
+  command = ["sh", "-c", <<EOF
+    # Start the Coder agent as the "coder" user
+    # once systemd has started up
+    sudo -u coder --preserve-env=CODER_AGENT_TOKEN /bin/bash -- <<-'    EOT' &
+    while [[ ! $(systemctl is-system-running) =~ ^(running|degraded) ]]
+    do
+      echo "Waiting for system to start... $(systemctl is-system-running)"
+      sleep 2
+    done
+    ${coder_agent.main.init_script}
+    EOT
+
+    exec /sbin/init
+    EOF
+    ,
+  ]
   env = ["CODER_AGENT_TOKEN=${coder_agent.main.token}"]
   runtime = "sysbox-runc"
   host {
