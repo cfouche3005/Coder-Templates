@@ -15,4 +15,4 @@ RUN curl -fsSL https://bun.sh/install | bash
 
 RUN echo 'export BUN_INSTALL="$HOME/.bun"' >> /home/coder/.zshrc && echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> /home/coder/.zshrc
 
-#a
+#b
