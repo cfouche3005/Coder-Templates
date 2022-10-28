@@ -2,7 +2,7 @@ FROM cf3005/ctdc-base:fedora-fleet
 
 USER root
 
-RUN curl -fsSL https://rpm.nodesource.com/setup_lts.x | bash -
+RUN curl -fsSL https://github.com/nodesource/distributions/blob/master/rpm/setup_lts.x | bash -
 
 RUN dnf -y update && \
     dnf -y install --setopt=install_weak_deps=False \

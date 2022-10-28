@@ -2,7 +2,7 @@ FROM cf3005/ctdc-base:ubuntu-vsc-fleet
 
 USER root
 
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+RUN curl -fsSL https://raw.githubusercontent.com/nodesource/distributions/master/deb/setup_lts.x | bash -
 
 RUN apt-get update && \
     DEBIAN_FRONTEND="noninteractive" apt-get install --yes --no-install-recommends \
