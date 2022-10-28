@@ -19,7 +19,7 @@ data "coder_workspace" "me" {
 }
 
 data "docker_registry_image" "docker_image" {
-  name = "cf3005/ctdc-ccpp:${var.docker_os}-${local.software[var.select_ide].tag}"
+  name = "cf3005/ctdc-php:${var.docker_os}-${local.software[var.select_ide].tag}"
 }
 
 
@@ -43,7 +43,7 @@ variable "docker_host" {
 }
 
 variable "docker_os" {
-  description = "Which Operating System would you like to use for your workspace?"
+  description = "Which Operating System would you like to use for your workspace ?"
   default = "debian"
   validation {
     condition = contains(["debian","fedora","ubuntu"], var.docker_os)
@@ -52,7 +52,7 @@ variable "docker_os" {
 }
 
 variable "select_ide" {
-  description = "What IDE do you want to be installed"
+  description = "What IDE do you want to be installed ? If you choose 'none', you can still connect with ssh (Remote ssh for Visual Studio Code or Fleet for example)"
   default = "none"
   validation {
     condition = contains(["none","vsc","fleet","vsc-fleet"], var.select_ide)
@@ -64,6 +64,7 @@ locals {
   software = {
     "none" = {
       "tag" = "vanilla"
+      "name" = "None"
       "count_vsc" = 0
       "count_fleet" = 0
       "startup_script" = <<EOF
@@ -72,6 +73,7 @@ locals {
     },
     "vsc" = {
       "tag" = "vsc"
+      "name" = "Visual Studio Code"
       "count_vsc" = 1
       "count_fleet" = 0
       "startup_script" = <<EOF
@@ -81,6 +83,7 @@ locals {
     },
     "fleet" = {
       "tag" = "fleet"
+      "name" = "Fleet"
       "count_vsc" = 0
       "count_fleet" = 1
       "startup_script" = <<EOF
@@ -90,6 +93,7 @@ locals {
     }
     "vsc-fleet" = {
       "tag" = "vsc-fleet"
+      "name" = "Visual Studio Code + Fleet"
       "count_vsc" = 1
       "count_fleet" = 1
       "startup_script" = <<EOF
@@ -99,6 +103,25 @@ locals {
         EOF
     }
   }
+  os = {
+    "debian" = {
+      "tag" = "debian"
+      "name" = "Debian"
+      "icon" = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/debian.png"
+    },
+    "ubuntu" = {
+      "tag" = "ubuntu"
+      "name" = "Ubuntu"
+      "icon" = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/ubuntu.png"
+    },
+    "fedora" = {
+      "tag" = "fedora"
+      "name" = "Fedora"
+      "icon" = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/fedora.png"
+    }
+  }
+
+
 }
 
 resource "coder_agent" "main" {
@@ -124,7 +147,7 @@ resource "coder_app" "code-server" {
   slug     = "code-server"
   url      = "http://localhost:13337"
   icon     = "/icon/code.svg"
-  display_name = "Visual Code Studio"
+  display_name = "Visual Studio Code"
 }
 
 resource "coder_app" "fleet" {
@@ -145,9 +168,18 @@ resource "docker_image" "docker_image" {
 resource "coder_metadata" "docker_image"{
   count = data.coder_workspace.me.start_count
   resource_id = docker_image.docker_image.id
+  icon = local.os[var.docker_os].icon
   item {
     key   = "Docker Image"
+    value = data.docker_registry_image.docker_image.name
+  }
+  item {
+    key   = "Docker Repo Digest (SHA256)"
     value = docker_image.docker_image.repo_digest
+  }
+  item {
+    key   = "Docker Registry Digest (SHA256)"
+    value = data.docker_registry_image.docker_image.sha256_digest
   }
 }
 
@@ -295,5 +327,18 @@ resource "docker_container" "workspace" {
     container_path = "/root/"
     volume_name    = docker_volume.root_volume.name
     read_only      = false
+  }
+}
+
+resource "coder_metadata" "workspace_info" {
+  count = data.coder_workspace.me.start_count
+  resource_id = docker_container.workspace[0].id
+  item {
+    key = "Operating System"
+    value = local.os[var.docker_os].name
+  }
+  item {
+    key = "IDE"
+    value = local.software[var.select_ide].name
   }
 }
