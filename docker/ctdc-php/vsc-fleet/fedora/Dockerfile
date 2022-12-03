@@ -5,6 +5,7 @@ USER root
 RUN dnf -y update && \
     dnf -y install --setopt=install_weak_deps=False \
     httpd \
+    php-xdebug \
     php-fpm \
     && dnf clean all
 

@@ -6,6 +6,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND="noninteractive" apt-get install --yes --no-install-recommends \
     apache2 \
     php \
+    php-xdebug \
     libapache2-mod-php \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
