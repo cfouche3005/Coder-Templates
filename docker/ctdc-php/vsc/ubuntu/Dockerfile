@@ -15,6 +15,7 @@ RUN echo "<?php" >> /var/www/html/info/info.php && \
     echo "  phpinfo();" >> /var/www/html/info/info.php && \
     echo "?>" >> /var/www/html/info/info.php
 RUN chown -R coder /var/www/html
+
 USER coder
 
 #a

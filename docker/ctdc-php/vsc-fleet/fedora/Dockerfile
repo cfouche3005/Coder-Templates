@@ -6,7 +6,7 @@ RUN dnf -y update && \
     dnf -y install --setopt=install_weak_deps=False \
     httpd \
     php-xdebug \
-    php-fpm \
+    php \
     && dnf clean all
 
 RUN mkdir /var/www/html/info
