@@ -1,23 +1,23 @@
-              docker/ctdc-php/vanilla/.* ctdc-php-vanilla true
-              docker/ctdc-php/vsc/.* ctdc-php-vsc true
-              docker/ctdc-php/fleet/.* ctdc-php-fleet true
-              docker/ctdc-php/vsc-fleet/.* ctdc-php-vsc-fleet true
+              docker/ctdc-python/vanilla/.* ctdc-python-vanilla true
+              docker/ctdc-python/vsc/.* ctdc-python-vsc true
+              docker/ctdc-python/fleet/.* ctdc-python-fleet true
+              docker/ctdc-python/vsc-fleet/.* ctdc-python-vsc-fleet true
 
-  ctdc-php-vanilla:
+  ctdc-python-vanilla:
     type: boolean
     default: false
-  ctdc-php-vsc:
+  ctdc-python-vsc:
     type: boolean
     default: false
-  ctdc-php-fleet:
+  ctdc-python-fleet:
     type: boolean
     default: false
-  ctdc-php-vsc-fleet:
+  ctdc-python-vsc-fleet:
     type: boolean
     default: false
 
-  ctdc-php-vanilla:
-    when: << pipeline.parameters.ctdc-php-vanilla >>
+  ctdc-python-vanilla:
+    when: << pipeline.parameters.ctdc-python-vanilla >>
     jobs:
       - DockerBuild-amd64 :
           name : build-amd64-<< matrix.os >>
@@ -26,7 +26,7 @@
               os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - vanilla
       - DockerBuild-arm64 :
           name : build-arm64-<< matrix.os >>
@@ -35,7 +35,7 @@
               os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - vanilla
       - DockerPublish-multiarch :
           name : publish-<< matrix.os >>
@@ -47,7 +47,7 @@
             - build-amd64-<< matrix.os >>
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - vanilla
       - DeleteTempImage:
           name : clearTemp-<< matrix.os >>
@@ -58,11 +58,11 @@
             - publish-<< matrix.os >>
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - vanilla
 
-  ctdc-php-vsc:
-    when: << pipeline.parameters.ctdc-php-vsc >>
+  ctdc-python-vsc:
+    when: << pipeline.parameters.ctdc-python-vsc >>
     jobs:
       - DockerBuild-amd64 :
           name : build-amd64-<< matrix.os >>
@@ -71,7 +71,7 @@
               os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - vsc
       - DockerBuild-arm64 :
           name : build-arm64-<< matrix.os >>
@@ -80,7 +80,7 @@
               os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - vsc
       - DockerPublish-multiarch :
           name : publish-<< matrix.os >>
@@ -92,7 +92,7 @@
             - build-amd64-<< matrix.os >>
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - vsc
       - DeleteTempImage:
           name : clearTemp-<< matrix.os >>
@@ -103,11 +103,11 @@
             - publish-<< matrix.os >>
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - vsc
 
-  ctdc-php-fleet:
-    when: << pipeline.parameters.ctdc-php-fleet >>
+  ctdc-python-fleet:
+    when: << pipeline.parameters.ctdc-python-fleet >>
     jobs:
       - DockerBuild-amd64 :
           name : build-amd64-<< matrix.os >>
@@ -116,7 +116,7 @@
               os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - fleet
       - DockerBuild-arm64 :
           name : build-arm64-<< matrix.os >>
@@ -125,7 +125,7 @@
               os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - fleet
       - DockerPublish-multiarch :
           name : publish-<< matrix.os >>
@@ -137,7 +137,7 @@
             - build-amd64-<< matrix.os >>
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - fleet
       - DeleteTempImage:
           name : clearTemp-<< matrix.os >>
@@ -148,11 +148,11 @@
             - publish-<< matrix.os >>
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - fleet
 
-  ctdc-php-vsc-fleet:
-    when: << pipeline.parameters.ctdc-php-vsc-fleet >>
+  ctdc-python-vsc-fleet:
+    when: << pipeline.parameters.ctdc-python-vsc-fleet >>
     jobs:
       - DockerBuild-amd64 :
           name : build-amd64-<< matrix.os >>
@@ -161,7 +161,7 @@
               os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - vsc-fleet
       - DockerBuild-arm64 :
           name : build-arm64-<< matrix.os >>
@@ -170,7 +170,7 @@
               os : ["debian","fedora","ubuntu"]
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - vsc-fleet
       - DockerPublish-multiarch :
           name : publish-<< matrix.os >>
@@ -182,7 +182,7 @@
             - build-amd64-<< matrix.os >>
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - vsc-fleet
       - DeleteTempImage:
           name : clearTemp-<< matrix.os >>
@@ -193,5 +193,5 @@
             - publish-<< matrix.os >>
           context : 
             - DockerHub
-            - ctdc-php
+            - ctdc-python
             - vsc-fleet
