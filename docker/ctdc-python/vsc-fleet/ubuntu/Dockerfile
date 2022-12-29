@@ -1,12 +1,12 @@
-FROM cf3005/ctdc-base:debian-no-vsc
+FROM cf3005/ctdc-base:ubuntu-vsc-fleet
 
 USER root
 
 RUN apt-get update && \
     DEBIAN_FRONTEND="noninteractive" apt-get install --yes --no-install-recommends \
-    python3.9 \
+    python3.10 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER coder
 
-#b
+#a

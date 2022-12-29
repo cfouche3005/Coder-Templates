@@ -1,4 +1,4 @@
-FROM cf3005/ctdc-base:ubuntu-vsc
+FROM cf3005/ctdc-base:ubuntu-vanilla
 
 USER root
 
