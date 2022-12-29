@@ -19,7 +19,7 @@ data "coder_workspace" "me" {
 }
 
 data "docker_registry_image" "docker_image" {
-  name = "cf3005/ctdc-php:${var.docker_os}-${local.software[var.select_ide].tag}"
+  name = "cf3005/ctdc-python:${var.docker_os}-${local.software[var.select_ide].tag}"
 }
 
 
