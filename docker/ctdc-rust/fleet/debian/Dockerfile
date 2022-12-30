@@ -1,4 +1,4 @@
-FROM cf3005/ctdc-base:ubuntu-no-vsc
+FROM cf3005/ctdc-base:debian-fleet
 
 USER coder
 

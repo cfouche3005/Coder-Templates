@@ -1,4 +1,4 @@
-FROM cf3005/ctdc-base:fedora-no-vsc
+FROM cf3005/ctdc-base:debian-vsc-fleet
 
 USER coder
 
