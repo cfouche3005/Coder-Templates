@@ -31,6 +31,10 @@ workflows:
               docker/ctdc-python/vsc/.* ctdc-python-vsc true
               docker/ctdc-python/fleet/.* ctdc-python-fleet true
               docker/ctdc-python/vsc-fleet/.* ctdc-python-vsc-fleet true
+              docker/ctdc-rust/vanilla/.* ctdc-rust-vanilla true
+              docker/ctdc-rust/vsc/.* ctdc-rust-vsc true
+              docker/ctdc-rust/fleet/.* ctdc-rust-fleet true
+              docker/ctdc-rust/vsc-fleet/.* ctdc-rust-vsc-fleet true
           base-revision: main
           config-path: .circleci/continue-config.yml
   
