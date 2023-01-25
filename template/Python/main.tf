@@ -2,11 +2,11 @@ terraform {
   required_providers {
     coder = {
       source  = "coder/coder"
-      version = "0.6.6"
+      version = "0.6.9"
     }
     docker = {
       source  = "kreuzwerker/docker"
-      version = "~> 2.24.0"
+      version = "~> 3.0.1"
     }
   }
 }
@@ -73,7 +73,7 @@ locals {
     },
     "vsc" = {
       "tag" = "vsc"
-      "name" = "Visual Studio Code"
+      "name" = "VS Code Web"
       "count_vsc" = 1
       "count_fleet" = 0
       "startup_script" = <<EOF
@@ -93,7 +93,7 @@ locals {
     }
     "vsc-fleet" = {
       "tag" = "vsc-fleet"
-      "name" = "Visual Studio Code + Fleet"
+      "name" = "VS Code Web + Fleet"
       "count_vsc" = 1
       "count_fleet" = 1
       "startup_script" = <<EOF
@@ -147,7 +147,7 @@ resource "coder_app" "code-server" {
   slug     = "code-server"
   url      = "http://localhost:13337"
   icon     = "/icon/code.svg"
-  display_name = "Visual Studio Code"
+  display_name = "VS Code Web"
 }
 
 resource "coder_app" "fleet" {
