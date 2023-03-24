@@ -7,6 +7,7 @@ RUN dnf -y update && \
     httpd \
     php-xdebug \
     php \
+    php-pgsql \
     && dnf clean all
 
 RUN mkdir /var/www/html/info

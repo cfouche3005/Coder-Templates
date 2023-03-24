@@ -8,6 +8,7 @@ RUN apt-get update && \
     php \
     php-xdebug \
     libapache2-mod-php \
+    php-pgsql \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /var/www/html/info
