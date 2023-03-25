@@ -2,61 +2,118 @@ terraform {
   required_providers {
     coder = {
       source  = "coder/coder"
-      version = "0.6.9"
+      version = "0.7.0-rc0"
     }
     docker = {
       source  = "kreuzwerker/docker"
-      version = "~> 3.0.1"
+      version = "~> 3.0.2"
     }
   }
 }
 
+provider "coder" {
+  feature_use_managed_variables = "true"
+}
+
 provider "docker" {
-  host = var.docker_host
+  host = data.coder_parameter.docker_host.value
 }
 
 data "coder_workspace" "me" {
 }
 
 data "docker_registry_image" "docker_image" {
-  name = "cf3005/ctdc-php:${var.docker_os}-${local.software[var.select_ide].tag}"
+  name = "cf3005/ctdc-php:${data.coder_parameter.docker_os.value}-${local.software[data.coder_parameter.select_ide.value].tag}"
 }
 
 
 # Variable
-variable "docker_host_arch" {
-  description = "CPU architecture of the Docker host"
-  default = "amd64"
-  validation {
-    condition = contains(["amd64","arm64"], var.docker_host_arch)
-    error_message = "Invalid Docker CPU architecture !"
-  }
-}
-
-variable "docker_host" {
-  description = "Address of the Docker host ([unix://], [ssh://], [tcp://])"
+data "coder_parameter" "docker_host" {
+  name = "Docker Host"
   default = "unix:///var/run/docker.sock"
+  description = "Address of the Docker host ([unix://], [ssh://], [tcp://])"
+  icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/docker.png"
+  mutable = false
+  type = "string"
   validation {
-    condition     = can(regex("(unix://)|(tcp://)|(ssh://)", var.docker_host))
-    error_message = "Invalid Docker Host !"
+    error = "Invalid Docker Host !"
+    regex = "(unix://)|(tcp://)|(ssh://)"
+  }
+}
+  
+data "coder_parameter" "docker_host_arch" {
+  name = "Docker Host Architecture"
+  default = "amd64"
+  description = "CPU architecture of the Docker host"
+  icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/docker.png"
+  mutable = false
+  type = "string"
+  option {
+    name = "Amd64"
+    value = "amd64"
+    description = "Intel/AMD CPU Architecture"
+  }
+  option {
+    name = "Arm64"
+    value = "arm64"
+    description = "ARM64 CPU Architecture"
   }
 }
 
-variable "docker_os" {
-  description = "Which Operating System would you like to use for your workspace ?"
+data "coder_parameter" "docker_os" {
+  name = "Operating System"
   default = "debian"
-  validation {
-    condition = contains(["debian","fedora","ubuntu"], var.docker_os)
-    error_message = "Invalid Docker OS !"
+  description = "Which Operating System would you like to use for your workspace ?"
+  icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tux.png"
+  mutable = false
+  type = "string"
+  option {
+    name = "Debian"
+    value = "debian"
+    icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/debian.png"
   }
+  option {
+    name = "Ubuntu"
+    value = "ubuntu"
+    icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/ubuntu.png"
+  }
+  option {
+    name = "Fedora"
+    value = "fedora"
+    icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/fedora.png"
+  } 
 }
 
-variable "select_ide" {
-  description = "What IDE do you want to be installed ? If you choose 'none', you can still connect with ssh (Remote ssh for Visual Studio Code or Fleet for example)"
+data "coder_parameter" "select_ide" {
+  name = "IDE"
   default = "none"
-  validation {
-    condition = contains(["none","vsc","fleet","vsc-fleet"], var.select_ide)
-    error_message = "Invalid IDE"
+  description = "What IDE do you want to be installed ?"
+  icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/nextcloud-news.png"
+  mutable = false
+  type = "string"
+  option {
+    name = "None"
+    value = "none"
+    icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/shelltips.png"
+    description = " If selected, you can still connect with ssh (Remote ssh for Visual Studio Code or Fleet for example)"
+  }
+  option {
+    name = "Visual Studio Code"
+    value = "vsc"
+    icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/vscode.png"
+    description = "Use the code-server Open Source implementation of Visual Studio Code"
+  }
+  option {
+    name = "Fleet"
+    value = "fleet"
+    icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/fleet.png"
+    description = "You also will need too install Fleet on your computer"
+  }
+  option {
+    name = "Visual Studio Code + Fleet"
+    value = "vsc-fleet"
+    icon = "https://cdn.jsdelivr.net/gh/cfouche3005/dashboard-icons/png/vscode+fleet.png"
+    description = ""
   }
 }
 
@@ -125,9 +182,9 @@ locals {
 }
 
 resource "coder_agent" "main" {
-  arch           = var.docker_host_arch
+  arch           = data.coder_parameter.docker_host_arch.value
   os             = "linux"
-  startup_script = local.software[var.select_ide].startup_script
+  startup_script = local.software[data.coder_parameter.select_ide.value].startup_script
 
   # These environment variables allow you to make Git commits right away after creating a
   # workspace. Note that they take precedence over configuration defined in ~/.gitconfig!
@@ -142,7 +199,7 @@ resource "coder_agent" "main" {
 }
 
 resource "coder_app" "code-server" {
-  count = local.software[var.select_ide].count_vsc
+  count = local.software[data.coder_parameter.select_ide.value].count_vsc
   agent_id = coder_agent.main.id
   slug     = "code-server"
   url      = "http://localhost:13337"
@@ -151,7 +208,7 @@ resource "coder_app" "code-server" {
 }
 
 resource "coder_app" "fleet" {
-  count = local.software[var.select_ide].count_fleet
+  count = local.software[data.coder_parameter.select_ide.value].count_fleet
   agent_id = coder_agent.main.id
   slug     = "fleet"
   command  = "fleet launch workspace -- --auth=accept-everyone --publish --enableSmartMode --workspacePort 13347"
@@ -168,7 +225,7 @@ resource "docker_image" "docker_image" {
 resource "coder_metadata" "docker_image"{
   count = data.coder_workspace.me.start_count
   resource_id = docker_image.docker_image.id
-  icon = local.os[var.docker_os].icon
+  icon = local.os[data.coder_parameter.docker_os.value].icon
   item {
     key   = "Docker Image"
     value = data.docker_registry_image.docker_image.name
@@ -335,10 +392,10 @@ resource "coder_metadata" "workspace_info" {
   resource_id = docker_container.workspace[0].id
   item {
     key = "Operating System"
-    value = local.os[var.docker_os].name
+    value = local.os[data.coder_parameter.docker_os.value].name
   }
   item {
     key = "IDE"
-    value = local.software[var.select_ide].name
+    value = local.software[data.coder_parameter.select_ide.value].name
   }
 }
