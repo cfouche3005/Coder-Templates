@@ -31,7 +31,7 @@ RUN systemctl mask systemd-udevd.service \
                    systemd-firstboot.service \
                    systemd-networkd-wait-online.service
 
-RUN curl -fsSL https://code-server.dev/install.sh | sh && dnf clean all
+RUN  wget -O- https://aka.ms/install-vscode-server/setup.sh | sh
 
 RUN cd /usr/bin && if [ "$(uname -m)" == "aarch64" ]; then curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=eap&platform=linux_aarch64" --output fleet && chmod +x fleet; else curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=eap&platform=linux_x64" --output fleet && chmod +x fleet; fi;
 
@@ -50,6 +50,4 @@ RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTO
 
 RUN sed -i.bak "s+robbyrussell+powerlevel10k/powerlevel10k+g" /home/coder/.zshrc
 
-ENV EXTENSIONS_GALLERY={"serviceUrl":"https://marketplace.visualstudio.com/_apis/public/gallery","cacheUrl":"https://vscode.blob.core.windows.net/gallery/index","itemUrl":"https://marketplace.visualstudio.com/items","controlUrl":"","recommendationsUrl":""}
-
-#b
+#a
