@@ -2,6 +2,8 @@ FROM ubuntu:rolling
 
 SHELL ["/bin/bash", "-c"]
 
+RUN userdel -r ubuntu
+
 RUN apt-get update && \
     DEBIAN_FRONTEND="noninteractive" apt-get install --yes --no-install-recommends \
       bash \
