@@ -135,7 +135,7 @@ locals {
       "count_fleet" = 0
       "startup_script" = <<EOF
         !/bin/sh
-        code-server --auth none --port 13337
+        /usr/local/bin/code-server --accept-server-license-terms serve-local --without-connection-token --quality stable --telemetry-level off >/tmp/code-server.log 2>&1
         EOF
     },
     "fleet" = {
@@ -155,7 +155,7 @@ locals {
       "count_fleet" = 1
       "startup_script" = <<EOF
         !/bin/sh
-        code-server --auth none --port 13337
+        /usr/local/bin/code-server --accept-server-license-terms serve-local --without-connection-token --quality stable --telemetry-level off >/tmp/code-server.log 2>&1
         /usr/bin/fleet launch workspace -- --auth=accept-everyone --publish --enableSmartMode --workspacePort 13347
         EOF
     }
@@ -202,7 +202,7 @@ resource "coder_app" "code-server" {
   count = local.software[data.coder_parameter.select_ide.value].count_vsc
   agent_id = coder_agent.main.id
   slug     = "code-server"
-  url      = "http://localhost:13337"
+  url      = "http://localhost:8000"
   icon     = "/icon/code.svg"
   display_name = "VS Code Web"
 }
