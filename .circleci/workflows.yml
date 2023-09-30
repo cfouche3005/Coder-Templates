@@ -1,5 +1,10 @@
 version: 2.1
 
+parameters:
+  ctdc-base:
+    type: boolean
+    default: false
+
 executors:
   vm-build-amd64:
     environment:
@@ -93,7 +98,7 @@ jobs:
             curl "https://hub.docker.com/v2/repositories/cf3005/ctdc-<<parameters.flavour>>/tags/<< parameters.os >>-arm64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
 workflows:
   build-base:
-    when: << pipeline.parameters.build_ctdc-base >>
+    when: << pipeline.parameters.ctdc-base >>
     jobs:
       - DockerBuild-amd64:
           flavour: base

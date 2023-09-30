@@ -6,11 +6,11 @@ orbs:
   path-filtering: circleci/path-filtering@1.0.0
 
 workflows:
-  file-check:
+  generate-config:
     jobs:
       - path-filtering/filter:
           name: check-updated-file
           base-revision: main
           config-path: .circleci/workflows.yml
           mapping: |
-            docker/base/.* build_ctdc-base true
+            docker/base/.* ctdc-base true
