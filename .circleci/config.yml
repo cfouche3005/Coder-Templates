@@ -3,38 +3,14 @@ version: 2.1
 setup: true
 
 orbs:
-  path-filtering: circleci/path-filtering@0.1.3
+  path-filtering: circleci/path-filtering@1.0.0
 
 workflows:
-  always-run:
+  file-check:
     jobs:
       - path-filtering/filter:
           name: check-updated-file
-          mapping: |          
-              docker/ctdc-base/vanilla/.* ctdc-base-vanilla true
-              docker/ctdc-base/vsc/.* ctdc-base-vsc true
-              docker/ctdc-base/fleet/.* ctdc-base-fleet true
-              docker/ctdc-base/vsc-fleet/.* ctdc-base-vsc-fleet true
-              docker/ctdc-node/vanilla/.* ctdc-node-vanilla true
-              docker/ctdc-node/vsc/.* ctdc-node-vsc true
-              docker/ctdc-node/fleet/.* ctdc-node-fleet true
-              docker/ctdc-node/vsc-fleet/.* ctdc-node-vsc-fleet true
-              docker/ctdc-ccpp/vanilla/.* ctdc-ccpp-vanilla true
-              docker/ctdc-ccpp/vsc/.* ctdc-ccpp-vsc true
-              docker/ctdc-ccpp/fleet/.* ctdc-ccpp-fleet true
-              docker/ctdc-ccpp/vsc-fleet/.* ctdc-ccpp-vsc-fleet true
-              docker/ctdc-php/vanilla/.* ctdc-php-vanilla true
-              docker/ctdc-php/vsc/.* ctdc-php-vsc true
-              docker/ctdc-php/fleet/.* ctdc-php-fleet true
-              docker/ctdc-php/vsc-fleet/.* ctdc-php-vsc-fleet true
-              docker/ctdc-python/vanilla/.* ctdc-python-vanilla true
-              docker/ctdc-python/vsc/.* ctdc-python-vsc true
-              docker/ctdc-python/fleet/.* ctdc-python-fleet true
-              docker/ctdc-python/vsc-fleet/.* ctdc-python-vsc-fleet true
-              docker/ctdc-rust/vanilla/.* ctdc-rust-vanilla true
-              docker/ctdc-rust/vsc/.* ctdc-rust-vsc true
-              docker/ctdc-rust/fleet/.* ctdc-rust-fleet true
-              docker/ctdc-rust/vsc-fleet/.* ctdc-rust-vsc-fleet true
           base-revision: main
-          config-path: .circleci/continue-config.yml
-  
+          config-path: .circleci/workflows.yml
+          mapping: |
+            docker/base/.* build_ctdc-base true

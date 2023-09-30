@@ -1,0 +1,3 @@
+.old
+templates/*/.terraform
+templates/*/.terraform.lock.hcl
