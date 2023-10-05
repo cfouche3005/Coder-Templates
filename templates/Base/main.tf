@@ -200,6 +200,10 @@ resource "coder_metadata" "docker_image" {
     value = data.coder_workspace.me.id
   }
   item {
+    key = "TAILSCALE DOMAIN"
+    value = "coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}.coder.internal"
+  }
+  item {
     key = "OS"
     value = local.os[data.coder_parameter.os.value].name
   }
@@ -278,7 +282,7 @@ resource "coder_app" "tailscale" {
   slug = "tailscale"
   display_name = "Tailscale"
   icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tailscale-light.png"
-  command = "${(data.coder_parameter.tailscale_url.value != "") && (data.coder_parameter.tailscale_authkey.value != "") ? "sudo /bin/tailscale up --login-server ${data.coder_parameter.tailscale_url.value} --authkey ${data.coder_parameter.tailscale_authkey.value} --hostname coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}; echo \"Tailscale started...\\n\"; sleep 30;" : "echo \"Tailscale not configured...\\n\"; sleep 30;"}"
+  command = "${(data.coder_parameter.tailscale_url.value != "") && (data.coder_parameter.tailscale_authkey.value != "") ? "sudo /bin/tailscale up --login-server ${data.coder_parameter.tailscale_url.value} --authkey ${data.coder_parameter.tailscale_authkey.value} --hostname coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}; echo \"Tailscale started...\\nDomain : coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}.coder.internal\"; sleep 30;" : "echo \"Tailscale not configured...\\n\"; sleep 30;"}"
 }
 
 resource "coder_app" "FTP" {
