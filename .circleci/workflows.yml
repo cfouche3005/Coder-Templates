@@ -114,7 +114,7 @@ workflows:
               os: [debian,fedora,ubuntu]
       - DockerPublish-multiarch:
           flavour: base
-          name: cf3005/ctdc-base:<< matrix.os >>
+          name: publish-cf3005/ctdc-base:<< matrix.os >>
           matrix:
             parameters:
               os: [debian,fedora,ubuntu]
