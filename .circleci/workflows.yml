@@ -96,22 +96,7 @@ jobs:
             echo $TOKEN
             curl "https://hub.docker.com/v2/repositories/cf3005/ctdc-<<parameters.flavour>>/tags/<< parameters.os >>-amd64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
             curl "https://hub.docker.com/v2/repositories/cf3005/ctdc-<<parameters.flavour>>/tags/<< parameters.os >>-arm64/" -X DELETE -H "Authorization: JWT ${TOKEN}"
-
-setup: true
-
-orbs:
-  path-filtering: circleci/path-filtering@1.0.0
-
 workflows:
-  file-check:
-    jobs:
-      - path-filtering/filter:
-          name: check-updated-file
-          base-revision: main
-          config-path: .circleci/config.yml
-          mapping: |
-            docker/base/.* ctdc-base true
-  
   build-base:
     when: << pipeline.parameters.ctdc-base >>
     jobs:
@@ -129,7 +114,7 @@ workflows:
               os: [debian,fedora,ubuntu]
       - DockerPublish-multiarch:
           flavour: base
-          name: publish-cf3005/ctdc-base:<< matrix.os >>
+          name: cf3005/ctdc-base:<< matrix.os >>
           matrix:
             parameters:
               os: [debian,fedora,ubuntu]
