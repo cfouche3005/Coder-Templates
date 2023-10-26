@@ -20,7 +20,7 @@ RUN dnf -y update && \
     zsh \
     wget \
     git \
-    ssh \
+    openssh \
     dnf-plugins-core \
     python3-pyftpdlib \
     && dnf clean all
