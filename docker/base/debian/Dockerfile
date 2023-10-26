@@ -21,6 +21,7 @@ RUN apt-get update && \
       zsh \
       wget \
       git \
+      ssh \
       python3-pyftpdlib \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
