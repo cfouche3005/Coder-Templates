@@ -12,6 +12,7 @@ RUN curl -fsSL https://raw.githubusercontent.com/nodesource/distributions/master
 RUN apt-get update && \
     DEBIAN_FRONTEND="noninteractive" apt-get install --yes --no-install-recommends \
     nodejs \
+    npm \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER coder
