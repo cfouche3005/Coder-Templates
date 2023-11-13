@@ -22,10 +22,8 @@ RUN apt-get update && \
       wget \
       git \
       ssh \
-      python3-pip \
+      python3-pyftpdlib \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN pip install pyftpdlib
 
 RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg | tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null
 RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.tailscale-keyring.list | tee /etc/apt/sources.list.d/tailscale.list
