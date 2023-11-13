@@ -22,8 +22,10 @@ RUN dnf -y update && \
     git \
     openssh \
     dnf-plugins-core \
-    python3-pyftpdlib \
+    python3-pip \
     && dnf clean all
+
+RUN pip3 install pyftpdlib PyOpenSSL pysendfile --break-system-packages
 
 RUN dnf config-manager --add-repo https://pkgs.tailscale.com/stable/fedora/tailscale.repo
 
