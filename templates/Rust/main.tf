@@ -355,6 +355,7 @@ resource "docker_container" "workspace" {
   hostname = "coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}"
   user = "0:0"
   runtime = "sysbox-runc"
+  //security_opts = ["seccomp=unconfined"]
   volumes {
     container_path = "/home/"
     volume_name    = docker_volume.home_volume.name
