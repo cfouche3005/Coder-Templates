@@ -26,7 +26,7 @@ RUN apt-get update && \
       python3-pip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install pyftpdlib PyOpenSSL pysendfile --break-system-packages
+RUN pip install pyftpdlib PyOpenSSL pysendfile --break-system-packages
 
 RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.noarmor.gpg | tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null
 RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.tailscale-keyring.list | tee /etc/apt/sources.list.d/tailscale.list
