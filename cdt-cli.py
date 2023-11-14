@@ -51,4 +51,4 @@ match sys.argv[1]:
             case "sync":
                 Template.sync(sys.argv[3])
             case "push":
-                Template.push(sys.argv[3],sys.argv[4] == "--update" or sys.argv[4] == "-u")
+                Template.push(sys.argv[3],sys.argv[4] == "--update" or sys.argv[4] == "-u" if len(sys.argv) > 4 else False)
