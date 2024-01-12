@@ -144,7 +144,7 @@ data "coder_parameter" "ide" {
 data "coder_parameter" "tailscale_url" {
     name = "tailscale_url" 
     default = "https://controlplane.tailscale.com"
-    description = "Base URL of a control server (leave blank for no tailscale)))"
+    description = "Base URL of a control server (leave blank for no tailscale)"
     display_name = "Tailscale URL"
     ephemeral = false
     icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tailscale.png"
@@ -212,6 +212,8 @@ resource "coder_metadata" "docker_image" {
 resource "coder_agent" "main" {
   arch           = local.docker_host[data.coder_parameter.docker_host.value].arch
   os             = "linux"
+  startup_script = "${(data.coder_parameter.tailscale_url.value != "") && (data.coder_parameter.tailscale_authkey.value != "") ? "sudo /bin/tailscale up --login-server ${data.coder_parameter.tailscale_url.value} --authkey ${data.coder_parameter.tailscale_authkey.value} --hostname coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}; echo \"Tailscale started...\\nDomain : coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}.coder.internal\";" : "echo \"Tailscale not configured...\\n\";"}"
+  startup_script_behavior = "blocking"
   display_apps {
     port_forwarding_helper = true
     ssh_helper = true
@@ -277,13 +279,13 @@ resource "coder_app" "fleet" {
   command = "fleet launch workspace --version 1.22.113 -- --auth=accept-everyone --publish --enableSmartMode --workspacePort 13347; sleep 30;"
 }
 
-resource "coder_app" "tailscale" {
-  agent_id = coder_agent.main.id
-  slug = "tailscale"
-  display_name = "Tailscale"
-  icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tailscale-light.png"
-  command = "${(data.coder_parameter.tailscale_url.value != "") && (data.coder_parameter.tailscale_authkey.value != "") ? "sudo /bin/tailscale up --login-server ${data.coder_parameter.tailscale_url.value} --authkey ${data.coder_parameter.tailscale_authkey.value} --hostname coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}; echo \"Tailscale started...\\nDomain : coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}.coder.internal\"; sleep 30;" : "echo \"Tailscale not configured...\\n\"; sleep 30;"}"
-}
+# resource "coder_app" "tailscale" {
+#   agent_id = coder_agent.main.id
+#   slug = "tailscale"
+#   display_name = "Tailscale"
+#   icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tailscale-light.png"
+#   command = "${(data.coder_parameter.tailscale_url.value != "") && (data.coder_parameter.tailscale_authkey.value != "") ? "sudo /bin/tailscale up --login-server ${data.coder_parameter.tailscale_url.value} --authkey ${data.coder_parameter.tailscale_authkey.value} --hostname coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}; echo \"Tailscale started...\\nDomain : coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}.coder.internal\"; sleep 30;" : "echo \"Tailscale not configured...\\n\"; sleep 30;"}"
+# }
 
 resource "coder_app" "FTP" {
   agent_id = coder_agent.main.id

@@ -11,10 +11,8 @@ class Build:
 class Template:
     @staticmethod
     def new(name):
-        os.makedirs("templates/"+name,755,exist_ok=True)
-        os.makedirs("templates/"+name+"/build",755,exist_ok=True)
         shutil.copyfile("templates/Base/main.tf", "templates/"+name+"/main.tf")
-        shutil.copytree("templates/Base/build", "templates/"+name+"/build")
+        shutil.copytree("templates/Base/build/", "templates/"+name+"/build/")
 
     @staticmethod
     def sync(template):
