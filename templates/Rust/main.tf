@@ -165,6 +165,82 @@ data "coder_parameter" "tailscale_authkey" {
     type = "string"
 }
 
+resource "coder_script" "vscode" {
+  count = contains(jsondecode(data.coder_parameter.ide.value), "vscode") ? 1 : 0
+  agent_id = coder_agent.main.id
+  display_name = "Visual Studio Code Server"
+  script = <<EOF
+    #check cpu architecture
+    if [ $(uname -m) = "x86_64" ]; then
+     INSTALL_ARCH="x64"
+    elif [ $(uname -m) = "aarch64" ] || [ $(uname -m) = "arm64" ]; then
+      INSTALL_ARCH="arm64"
+    fi
+    
+    cd /tmp
+
+    #check if vscode is installed
+    if ! command -v code &> /dev/null; then
+      echo "code CLI command could not be found";
+      echo "Installing Visual Studio Code Server...";
+      curl -LkSs "https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-$INSTALL_ARCH" --output vscode_cli.tar.gz && sudo tar -xf vscode_cli.tar.gz -C /usr/local/bin/ && sudo chmod +x /usr/local/bin/code && rm vscode_cli.tar.gz
+      if [ $? -ne 0 ]; then
+        echo "Failed to install vscode-cli"
+        exit 1
+      fi
+      echo "🥳 Visual Studio Code Server installed successfully";
+    else
+      echo "🥳 Visual Studio Code Server already installed";
+    fi
+
+    #start vscode
+    echo "Starting Visual Studio Code Server...";
+    echo "👷 Running code serv-web --port 8069 --without-connection-token --accept-server-license-terms in the background..."
+    echo "Check logs at /tmp/vscode-web.log"
+    code serv-web -- --port 8069 --without-connection-token --accept-server-license-terms > /tmp/vscode-web.log 2>&1 &
+  EOF
+  icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/vscode.png"
+  log_path = "/tmp/install.vscode-web.log"
+  run_on_start = true
+  run_on_stop = false
+  start_blocks_login = true
+  }
+
+resource "coder_script" "fleet" {
+  count = contains(jsondecode(data.coder_parameter.ide.value), "fleet") ? 1 : 0
+  agent_id = coder_agent.main.id
+  display_name = "Fleet"
+  script = <<EOF
+    #check cpu architecture
+    if [ $(uname -m) = "x86_64" ]; then
+     INSTALL_ARCH="x64"
+    elif [ $(uname -m) = "aarch64" ] || [ $(uname -m) = "arm64" ]; then
+      INSTALL_ARCH="aarch64"
+    fi
+    
+    cd /tmp
+
+    #check if fleet is installed
+    if ! command -v fleet &> /dev/null; then
+      echo "fleet command could not be found";
+      echo "Installing Fleet...";
+      curl -LkSs "https://download.jetbrains.com/product?code=FLL&release.type=preview&release.type=eap&platform=linux_$ARCH" --output fleet && chmod +x fleet && sudo mv fleet /usr/local/bin/
+      if [ $? -ne 0 ]; then
+        echo "Failed to install fleet"
+        exit 1
+      fi
+      echo "🥳 Fleet installed successfully";
+    else
+      echo "🥳 Fleet already installed";
+    fi
+  EOF
+  icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/jetbrains-fleet.png"
+  log_path = "/tmp/install.fleet.log"
+  run_on_start = true
+  run_on_stop = false
+  start_blocks_login = true
+  }
+
 data "docker_registry_image" "base" {
   name = "cf3005/ctdc-base:${data.coder_parameter.os.value}"
 }
@@ -200,19 +276,20 @@ resource "coder_metadata" "docker_image" {
     value = data.coder_workspace.me.id
   }
   item {
-    key = "TAILSCALE DOMAIN"
-    value = "coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}.coder.internal"
+    key = "TAILSCALE URL"
+    value = data.coder_parameter.tailscale_url.value == "" ? "None" : data.coder_parameter.tailscale_url.value
   }
   item {
-    key = "OS"
-    value = local.os[data.coder_parameter.os.value].name
+    key = "TAILSCALE AUTHKEY"
+    value = data.coder_parameter.tailscale_authkey.value == "" ? "None" : data.coder_parameter.tailscale_authkey.value
+    sensitive = true
   }
 }
 
 resource "coder_agent" "main" {
   arch           = local.docker_host[data.coder_parameter.docker_host.value].arch
   os             = "linux"
-  startup_script = "${(data.coder_parameter.tailscale_url.value != "") && (data.coder_parameter.tailscale_authkey.value != "") ? "sudo /bin/tailscale up --login-server ${data.coder_parameter.tailscale_url.value} --authkey ${data.coder_parameter.tailscale_authkey.value} --hostname coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}; echo \"Tailscale started...\\nDomain : coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}.coder.internal\";" : "echo \"Tailscale not configured...\\n\";"}"
+  startup_script = "${(data.coder_parameter.tailscale_url.value != "") && (data.coder_parameter.tailscale_authkey.value != "") ? "sudo /bin/tailscale up --login-server ${data.coder_parameter.tailscale_url.value} --authkey ${data.coder_parameter.tailscale_authkey.value} --hostname coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}; echo \"Tailscale started...\";tailscale whois $(tailscale ip -4);" : "echo \"Tailscale not configured...\\n\";"}"
   startup_script_behavior = "blocking"
   display_apps {
     port_forwarding_helper = true
@@ -258,6 +335,20 @@ resource "coder_agent" "main" {
     interval     = 10
     timeout      = 1
   }
+  metadata {
+    display_name = "Tailscale IPv4"
+    key          = "tailscale_ipv4"
+    script       = "tailscale ip -4"
+    interval     = 10
+    timeout      = 1
+  }
+  metadata {
+    display_name = "Tailscale IPv6"
+    key          = "tailscale_ipv6"
+    script       = "tailscale ip -6"
+    interval     = 10
+    timeout      = 1
+  }
 }
 
 resource "coder_app" "vscode" {
@@ -267,7 +358,7 @@ resource "coder_app" "vscode" {
   display_name = "Visual Studio Code Server"
   external = false
   icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/vscode.png"
-  url = "http://localhost:8080"
+  url = "http://localhost:8069"
 }
 
 resource "coder_app" "fleet" {
@@ -276,7 +367,7 @@ resource "coder_app" "fleet" {
   slug = "fleet"
   display_name = "Fleet"
   icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/jetbrains-fleet.png"
-  command = "fleet launch workspace --version 1.22.113 -- --auth=accept-everyone --publish --enableSmartMode --workspacePort 13347; sleep 30;"
+  command = "fleet launch workspace -- --auth=accept-everyone --publish --enableSmartMode; sleep 30;"
 }
 
 # resource "coder_app" "tailscale" {
@@ -300,21 +391,20 @@ resource "coder_metadata" "workspace_info" {
   resource_id = docker_container.workspace[0].id
   hide = false
   item {
-    key = "IDE"
-    value = !(contains(jsondecode(data.coder_parameter.ide.value), "fleet")) && !(contains(jsondecode(data.coder_parameter.ide.value), "vscode"))  ? "None" : join(", ", jsondecode(data.coder_parameter.ide.value))
-  }
-  item {
     key = "HOST"
     value = local.docker_host[data.coder_parameter.docker_host.value].name
   }
   item {
-    key = "TAILSCALE URL"
-    value = data.coder_parameter.tailscale_url.value == "" ? "None" : data.coder_parameter.tailscale_url.value
+    key = "OS"
+    value = local.os[data.coder_parameter.os.value].name
   }
   item {
-    key = "TAILSCALE AUTHKEY"
-    value = data.coder_parameter.tailscale_authkey.value == "" ? "None" : data.coder_parameter.tailscale_authkey.value
-    sensitive = true
+    key = "IDE"
+    value = !(contains(jsondecode(data.coder_parameter.ide.value), "fleet")) && !(contains(jsondecode(data.coder_parameter.ide.value), "vscode"))  ? "None" : join(", ", jsondecode(data.coder_parameter.ide.value))
+  }
+  item {
+    key = "TAILSCALE DOMAIN"
+    value = "coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}.coder.internal"
   }
 }
 

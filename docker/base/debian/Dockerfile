@@ -54,8 +54,6 @@ RUN useradd coder \
       --user-group && \
     echo "coder ALL=(ALL) NOPASSWD:ALL" >>/etc/sudoers.d/nopasswd
 
-COPY ./ide-install.sh /tools/ide-install.sh
-RUN chmod +x /tools/ide-install.sh
 
 USER coder
 
