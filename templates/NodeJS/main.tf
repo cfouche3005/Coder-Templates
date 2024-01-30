@@ -58,17 +58,6 @@ locals {
       "icon" = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/fedora.png"
     }
   }
-  ide = {
-    "vscode" = {
-      "name" = "Visual Studio Code"
-      "icon" = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/vscode.png"
-    },
-    "fleet" = {
-      "name" = "Fleet"
-      "icon" = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/jetbrains-fleet.png"
-    }
-  }
-
 }
 
 data "coder_parameter" "docker_host" {
@@ -128,26 +117,13 @@ data "coder_parameter" "os" {
     }  
 }
 
-data "coder_parameter" "ide" {
-    name = "ide" 
-    default = jsonencode(["vscode","fleet"])
-    description = "The IDE to use for the workspace"
-    display_name = "IDE"
-    ephemeral = false
-    icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/nextcloud-news.png"
-    mutable = true
-    order = 3
-    type = "list(string)"
-
-}
-
 data "coder_parameter" "tailscale_url" {
     name = "tailscale_url" 
     default = "https://controlplane.tailscale.com"
     description = "Base URL of a control server (leave blank for no tailscale)"
     display_name = "Tailscale URL"
     ephemeral = false
-    icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tailscale.png"
+    icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tailscale-light.png"
     mutable = true
     order = 4
     type = "string"
@@ -159,87 +135,11 @@ data "coder_parameter" "tailscale_authkey" {
     description = "The authkey to use for the workspace (leave blank for no tailscale)"
     display_name = "Tailscale Authkey"
     ephemeral = false
-    icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tailscale.png"
+    icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tailscale-light.png"
     mutable = true
     order = 5
     type = "string"
 }
-
-resource "coder_script" "vscode" {
-  count = contains(jsondecode(data.coder_parameter.ide.value), "vscode") ? 1 : 0
-  agent_id = coder_agent.main.id
-  display_name = "Visual Studio Code Server"
-  script = <<EOF
-    #check cpu architecture
-    if [ $(uname -m) = "x86_64" ]; then
-     INSTALL_ARCH="x64"
-    elif [ $(uname -m) = "aarch64" ] || [ $(uname -m) = "arm64" ]; then
-      INSTALL_ARCH="arm64"
-    fi
-    
-    cd /tmp
-
-    #check if vscode is installed
-    if ! command -v code &> /dev/null; then
-      echo "code CLI command could not be found";
-      echo "Installing Visual Studio Code Server...";
-      curl -LkSs "https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-$INSTALL_ARCH" --output vscode_cli.tar.gz && sudo tar -xf vscode_cli.tar.gz -C /usr/local/bin/ && sudo chmod +x /usr/local/bin/code && rm vscode_cli.tar.gz
-      if [ $? -ne 0 ]; then
-        echo "Failed to install vscode-cli"
-        exit 1
-      fi
-      echo "🥳 Visual Studio Code Server installed successfully";
-    else
-      echo "🥳 Visual Studio Code Server already installed";
-    fi
-
-    #start vscode
-    echo "Starting Visual Studio Code Server...";
-    echo "👷 Running code serv-web --port 8069 --without-connection-token --accept-server-license-terms in the background..."
-    echo "Check logs at /tmp/vscode-web.log"
-    code serv-web -- --port 8069 --without-connection-token --accept-server-license-terms > /tmp/vscode-web.log 2>&1 &
-  EOF
-  icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/vscode.png"
-  log_path = "/tmp/install.vscode-web.log"
-  run_on_start = true
-  run_on_stop = false
-  start_blocks_login = true
-  }
-
-resource "coder_script" "fleet" {
-  count = contains(jsondecode(data.coder_parameter.ide.value), "fleet") ? 1 : 0
-  agent_id = coder_agent.main.id
-  display_name = "Fleet"
-  script = <<EOF
-    #check cpu architecture
-    if [ $(uname -m) = "x86_64" ]; then
-     INSTALL_ARCH="x64"
-    elif [ $(uname -m) = "aarch64" ] || [ $(uname -m) = "arm64" ]; then
-      INSTALL_ARCH="aarch64"
-    fi
-    
-    cd /tmp
-
-    #check if fleet is installed
-    if ! command -v fleet &> /dev/null; then
-      echo "fleet command could not be found";
-      echo "Installing Fleet...";
-      curl -LkSs "https://download.jetbrains.com/product?code=FLL&release.type=preview&release.type=eap&platform=linux_$ARCH" --output fleet && chmod +x fleet && sudo mv fleet /usr/local/bin/
-      if [ $? -ne 0 ]; then
-        echo "Failed to install fleet"
-        exit 1
-      fi
-      echo "🥳 Fleet installed successfully";
-    else
-      echo "🥳 Fleet already installed";
-    fi
-  EOF
-  icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/jetbrains-fleet.png"
-  log_path = "/tmp/install.fleet.log"
-  run_on_start = true
-  run_on_stop = false
-  start_blocks_login = true
-  }
 
 data "docker_registry_image" "base" {
   name = "cf3005/ctdc-base:${data.coder_parameter.os.value}"
@@ -251,16 +151,10 @@ resource "docker_image" "main" {
   build {
     context = "./build"
     dockerfile = "${data.coder_parameter.os.value}.Dockerfile"
-    build_args = {
-      FLEET : contains(jsondecode(data.coder_parameter.ide.value), "fleet") ? "true" : "false"
-      VSCODE : contains(jsondecode(data.coder_parameter.ide.value), "vscode") ? "true" : "false"
-    }
     pull_parent = true
   }
   triggers = {
     base_image = data.docker_registry_image.base.sha256_digest
-    ide_fleet = contains(jsondecode(data.coder_parameter.ide.value), "fleet") ? "true" : "false"
-    ide_vscode = contains(jsondecode(data.coder_parameter.ide.value), "vscode") ? "true" : "false"
   } 
 }
 
@@ -351,33 +245,6 @@ resource "coder_agent" "main" {
   }
 }
 
-resource "coder_app" "vscode" {
-  count = contains(jsondecode(data.coder_parameter.ide.value), "vscode") ? 1 : 0
-  agent_id = coder_agent.main.id
-  slug = "vscode"
-  display_name = "Visual Studio Code Server"
-  external = false
-  icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/vscode.png"
-  url = "http://localhost:8069"
-}
-
-resource "coder_app" "fleet" {
-  count = contains(jsondecode(data.coder_parameter.ide.value), "fleet") ? 1 : 0
-  agent_id = coder_agent.main.id
-  slug = "fleet"
-  display_name = "Fleet"
-  icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/jetbrains-fleet.png"
-  command = "fleet launch workspace -- --auth=accept-everyone --publish --enableSmartMode; sleep 30;"
-}
-
-# resource "coder_app" "tailscale" {
-#   agent_id = coder_agent.main.id
-#   slug = "tailscale"
-#   display_name = "Tailscale"
-#   icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tailscale-light.png"
-#   command = "${(data.coder_parameter.tailscale_url.value != "") && (data.coder_parameter.tailscale_authkey.value != "") ? "sudo /bin/tailscale up --login-server ${data.coder_parameter.tailscale_url.value} --authkey ${data.coder_parameter.tailscale_authkey.value} --hostname coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}; echo \"Tailscale started...\\nDomain : coder-${data.coder_workspace.me.owner}-${lower(data.coder_workspace.me.name)}.coder.internal\"; sleep 30;" : "echo \"Tailscale not configured...\\n\"; sleep 30;"}"
-# }
-
 resource "coder_app" "FTP" {
   agent_id = coder_agent.main.id
   slug = "ftp"
@@ -397,10 +264,6 @@ resource "coder_metadata" "workspace_info" {
   item {
     key = "OS"
     value = local.os[data.coder_parameter.os.value].name
-  }
-  item {
-    key = "IDE"
-    value = !(contains(jsondecode(data.coder_parameter.ide.value), "fleet")) && !(contains(jsondecode(data.coder_parameter.ide.value), "vscode"))  ? "None" : join(", ", jsondecode(data.coder_parameter.ide.value))
   }
   item {
     key = "TAILSCALE DOMAIN"

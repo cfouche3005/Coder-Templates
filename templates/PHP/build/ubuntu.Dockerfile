@@ -5,8 +5,6 @@ ARG VSCODE
 
 USER root
 
-RUN /tools/ide-install.sh >> /root/ide-install.log 2>&1
-
 RUN apt-get update && \
     DEBIAN_FRONTEND="noninteractive" apt-get install --yes --no-install-recommends \
     apache2 \
